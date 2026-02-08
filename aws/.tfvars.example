@@ -1,0 +1,83 @@
+# Example Terraform Variables for aws-lab
+# Copy this file to terraform.tfvars and fill in values
+# DO NOT commit terraform.tfvars (it's in .gitignore)
+
+# =============================================================================
+# REQUIRED VARIABLES
+# =============================================================================
+
+# AWS Configuration
+aws_region = "us-west-2"
+
+# Project Identification
+project_name = "my-project"
+environment  = "dev"
+
+# =============================================================================
+# NETWORKING
+# =============================================================================
+
+# VPC Configuration
+vpc_cidr = "10.0.0.0/16"
+
+# Availability Zones (leave empty for auto-selection)
+# availability_zones = ["us-west-2a", "us-west-2b", "us-west-2c"]
+
+# =============================================================================
+# ECS CONFIGURATION
+# =============================================================================
+
+# Cluster Name (defaults to project-environment)
+# ecs_cluster_name = "my-cluster"
+
+# Launch Type: "FARGATE" or "EC2"
+ecs_launch_type = "FARGATE"
+
+# Fargate capacity provider strategy
+# fargate_capacity_providers = ["FARGATE", "FARGATE_SPOT"]
+
+# =============================================================================
+# CONTAINER CONFIGURATION
+# =============================================================================
+
+# Container image
+container_image = "nginx:latest"
+
+# Container resources
+container_cpu    = 256   # CPU units (256 = 0.25 vCPU)
+container_memory = 512   # Memory in MB
+
+# Desired count
+desired_count = 2
+
+# =============================================================================
+# NETWORKING OPTIONS
+# =============================================================================
+
+# Enable public IP for tasks
+assign_public_ip = true
+
+# Enable NAT Gateway (for private subnets)
+enable_nat_gateway = false
+
+# =============================================================================
+# MONITORING
+# =============================================================================
+
+# CloudWatch Container Insights
+enable_container_insights = true
+
+# Log retention (days)
+log_retention_days = 7
+
+# =============================================================================
+# TAGS
+# =============================================================================
+
+# Common tags applied to all resources
+tags = {
+  Environment = "dev"
+  Project     = "my-project"
+  ManagedBy   = "terraform"
+  CostCenter  = "engineering"
+}

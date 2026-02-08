@@ -1,0 +1,127 @@
+# Git Ignore for aws-lab (Terraform-focused)
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform directory
+.terraform/
+.terraform.lock.hcl
+
+# Crash log files
+crash.log
+crash.*.log
+
+# tfvars files (may contain secrets)
+*.tfvars
+!*.tfvars.example
+!terraform.tfvars.example
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform plan files
+*.tfplan
+tfplan
+plan.out
+
+# Terraform docs generated
+.terraform.docs.yaml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# AWS credentials (never commit)
+credentials
+.aws/
+aws-credentials*
+
+# SSH keys
+*.pem
+*.key
+id_rsa*
+*.ppk
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Go (for Terratest)
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Python (if using boto3 scripts)
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node (if using CDK or pulumi)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build artifacts
+dist/
+build/
+
+# Documentation build
+site/
+.cache/
+
+# Infracost
+.infracost/
+
+# Checkov
+.checkov/
+
+# tfsec
+.tfsec/
+
+# Sentinel (for Terraform Enterprise)
+.sentinel/
+
+# Local development
+.local/
+*.local
+
+# Backup files
+*.bak
+*.backup
+
+# Archive files
+*.zip
+*.tar
+*.tar.gz
+*.tgz

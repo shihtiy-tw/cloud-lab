@@ -1,0 +1,15 @@
+version: "1.0.0"
+type: monorepo
+template_source: lab-template
+tracked_files:
+  - .env.example
+  - .gitignore
+  - .pre-commit-config.yaml
+  - CONTRIBUTING.md
+  - scripts/setup.sh
+  - scripts/verify.sh
+customizations:
+  - README.md
+  - AGENTS.md
+  - CLAUDE.md
+  - GEMINI.md

@@ -1,0 +1,23 @@
+# ShellCheck Configuration for aws-lab
+# https://www.shellcheck.net/wiki/
+
+# Enable all checks by default
+enable=all
+
+# Disable specific warnings that cause false positives
+
+# SC2034: Variable appears unused (false positives in sourced files)
+disable=SC2034
+
+# SC1090: Can't follow non-constant source
+disable=SC1090
+
+# SC1091: Not following sourced files
+disable=SC1091
+
+# Shell options
+shell=bash
+
+# External sources
+source-path=SCRIPTDIR
+source-path=./shared

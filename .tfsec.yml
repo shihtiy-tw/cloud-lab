@@ -1,0 +1,41 @@
+# tfsec Configuration for aws-lab
+# https://aquasecurity.github.io/tfsec/
+
+---
+# Minimum severity to report
+minimum_severity: MEDIUM
+
+# Exclude specific rules (with justification)
+exclude:
+  # AWS004: Publicly accessible security group (sometimes needed for demos)
+  # Note: Re-enable for production deployments
+  # - aws-ec2-no-public-ingress-sgr
+
+# Custom checks (if any)
+custom_checks_dir: .tfsec/custom
+
+# Include passed checks in output
+include_passed: false
+
+# Include ignored checks in output
+include_ignored: true
+
+# Output format
+format: default
+
+# Soft fail (don't exit non-zero)
+soft_fail: false
+
+# Force all checks regardless of .tfsec-ignore
+force_all_dirs: false
+
+# Exclude paths from scanning
+exclude_path:
+  - examples/
+  - tests/fixtures/
+  - vendor/
+
+# Severity overrides
+severity_overrides:
+  # Override specific rules if needed
+  # aws-s3-enable-bucket-logging: LOW
