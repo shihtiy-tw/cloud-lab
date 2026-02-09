@@ -21,13 +21,16 @@ You **MUST** consider the user input before proceeding (if not empty).
 1. Read the `tasks.md` file from the extracted path.
 1. Get the current project context by running:
    - `vibe_kanban_get_context` to get the `project_id`.
-1. Parse the `tasks.md` file and extract tasks. A task is identified by the format:
-   - `- [ ] [TaskID] [P?] [Story?] Description with file path`
-1. For each task in the list, use the `vibe_kanban_create_task` tool to create a new task in the project.
-   - `project_id`: Use the ID obtained from `vibe_kanban_get_context`.
-   - `title`: Use the task description (including TaskID, P/Story markers, and file path).
-   - `description`: Optionally include more details if available in tasks.md, otherwise leave empty.
+1. **Group Tasks by Phase/User Story**:
+   - Parse `tasks.md` and identify sections starting with `## Phase N: [Title]`.
+   - For each section, collect all atomic tasks (`- [ ] ...`) belonging to it.
+1. **Create Vibe Kanban Tasks**:
+   - For each **Phase/User Story** identified:
+     - `project_id`: Use the ID obtained from `vibe_kanban_get_context`.
+     - `title`: Use the Phase/Story header (e.g., "Phase 3: User Story 1 - [Title]").
+     - `description`: Create a markdown checklist of all atomic tasks within that phase.
+1. If there are tasks not belonging to any phase (e.g., at the top of the file), create a "General Setup" task for them.
 
 > [!IMPORTANT]
-> Ensure all tasks follow the standard spec-driven workflow format before creating them in Vibe Kanban.
+> This grouping ensures the Kanban board tracks meaningful increments (User Stories/Phases) rather than atomic file changes, keeping the board clean and actionable.
 """
