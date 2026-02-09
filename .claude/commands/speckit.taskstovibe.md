@@ -1,0 +1,29 @@
+---
+description: Convert existing tasks into actionable Vibe Kanban tasks for the feature based on available design artifacts.
+tools: ['vibe_kanban_get_context', 'vibe_kanban_create_task']
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty).
+
+## Outline
+
+1. Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. From the executed script, extract the path to **TASKS**.
+1. Read the `tasks.md` file from the extracted path.
+1. Get the current project context by running:
+   - `vibe_kanban_get_context` to get the `project_id`.
+1. Parse the `tasks.md` file and extract tasks. A task is identified by the format:
+   - `- [ ] [TaskID] [P?] [Story?] Description with file path`
+1. For each task in the list, use the `vibe_kanban_create_task` tool to create a new task in the project.
+   - `project_id`: Use the ID obtained from `vibe_kanban_get_context`.
+   - `title`: Use the task description (including TaskID, P/Story markers, and file path).
+   - `description`: Optionally include more details if available in tasks.md, otherwise leave empty.
+
+> [!IMPORTANT]
+> Ensure all tasks follow the standard spec-driven workflow format before creating them in Vibe Kanban.
