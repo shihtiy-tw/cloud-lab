@@ -1,8 +1,6 @@
 # Cloud Lab - Multi-Cloud Infrastructure
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Terraform](https://img.shields.io/badge/Terraform-1.0+-purple?logo=terraform)](https://www.terraform.io/)
-[![Multi-Cloud](https://img.shields.io/badge/Multi--Cloud-AWS%20%7C%20GCP%20%7C%20Azure%20%7C%20Oracle-blue)]()
+[Multi-Cloud]()
 
 A comprehensive multi-cloud infrastructure lab covering AWS, GCP, Azure, and Oracle Cloud. This repository provides consistent, reusable infrastructure patterns and real-world scenarios across cloud providers.
 
@@ -18,12 +16,13 @@ This lab project demonstrates infrastructure-as-code patterns across multiple cl
 
 ## 🌥️ Supported Cloud Providers
 
-| Provider | Status | Services |
-|----------|--------|----------|
-| **AWS** | ✅ Active | ECS, Lambda, S3, EFS, RDS, VPC |
-| **GCP** | 🔜 Planned | GKE, Cloud Run, GCS, Cloud SQL |
-| **Azure** | 🔜 Planned | AKS, Container Instances, Blob Storage |
-| **Oracle** | 🔜 Planned | OKE, Object Storage, Autonomous DB |
+| Provider   | Status    | Services                               |
+| ---------- | --------- | -------------------------------------- |
+| **AWS**    | ✅ Active  | ECS, Lambda, S3, EFS, RDS, VPC         |
+| **GCP**    | 🔜 Planned | GKE, Cloud Run, GCS, Cloud SQL         |
+| **Azure**  | 🔜 Planned | AKS, Container Instances, Blob Storage |
+| **Oracle** | 🔜 Planned | OKE, Object Storage, Autonomous DB     |
+
 
 ## 🚀 Quick Start
 
@@ -36,7 +35,7 @@ This lab project demonstrates infrastructure-as-code patterns across multiple cl
 
 ### AWS Scenarios
 
-```bash
+``` bash
 # Navigate to an AWS ECS scenario
 cd aws/compute/ecs/scenarios/ecs-fargate-service-with-alb
 
@@ -53,7 +52,7 @@ terraform destroy
 
 ### Future - Multi-Cloud
 
-```bash
+``` bash
 # Switch cloud context
 ./scripts/switch-cloud.sh gcp
 
@@ -117,7 +116,7 @@ Each cloud provider follows the same structure:
 
 ### Running Tests
 
-```bash
+``` bash
 # Run all tests
 cd tests
 go test -v ./...
@@ -173,7 +172,7 @@ go test -v -run TestECS
 
 This project uses Terratest for infrastructure testing:
 
-```bash
+``` bash
 # Install dependencies
 cd tests
 go mod download
@@ -189,11 +188,11 @@ go test -v -tags=integration ./...
 
 Contributions are welcome! When adding new cloud providers or services:
 
-1. Follow the established directory structure
-2. Include comprehensive documentation
-3. Add integration tests
-4. Update this README
-5. Ensure 12-factor compliance
+1.  Follow the established directory structure
+2.  Include comprehensive documentation
+3.  Add integration tests
+4.  Update this README
+5.  Ensure 12-factor compliance
 
 ## 📄 License
 
@@ -210,6 +209,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🗺️ Roadmap
 
 ### Phase 1: AWS (Current)
+
 - [x] ECS infrastructure and scenarios
 - [x] Shared modules (VPC, ALB, IAM)
 - [x] Storage scenarios (S3, EFS)
@@ -219,6 +219,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [ ] Complete EC2 scenarios
 
 ### Phase 2: GCP (Next)
+
 - [ ] GKE basic cluster
 - [ ] Cloud Run deployments
 - [ ] GCS storage patterns
@@ -227,6 +228,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [ ] Shared GCP modules
 
 ### Phase 3: Azure
+
 - [ ] AKS cluster setup
 - [ ] Container Instances
 - [ ] Blob Storage
@@ -234,12 +236,14 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [ ] VNet configuration
 
 ### Phase 4: Oracle
+
 - [ ] OKE cluster
 - [ ] Autonomous Database
 - [ ] Object Storage
 - [ ] VCN setup
 
 ### Phase 5: Multi-Cloud
+
 - [ ] Cross-cloud patterns
 - [ ] Unified CLI tool
 - [ ] Cost comparison tools
@@ -252,11 +256,13 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 This repository was created by migrating the existing `aws-lab` into a multi-cloud structure. All AWS content has been moved to the `aws/` subdirectory, maintaining the same organization while preparing for expansion to other cloud providers.
 
 **What changed**:
+
 - Location: `aws-lab/` → `cloud-lab/aws/`
 - Repository name: `aws-lab` → `cloud-lab`
 - Structure: Now organized for multi-cloud expansion
 
 **What stayed the same**:
+
 - All AWS infrastructure code
 - Module organization
 - Testing framework

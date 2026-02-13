@@ -1,79 +1,87 @@
-# Cloud Lab - Multi-Cloud Infrastructure Makefile
-# Main entry point for development tasks across all cloud providers
+.PHONY: help aws gcp azure oracle test lint security docs clean
 
-.PHONY: help init plan apply destroy test clean lint docs
-.PHONY: aws-init aws-plan aws-apply aws-destroy
-.PHONY: gcp-init gcp-plan gcp-apply gcp-destroy
-.PHONY: azure-init azure-plan azure-apply azure-destroy
-.PHONY: oracle-init oracle-plan oracle-apply oracle-destroy
-
-# Colors
-GREEN=\033[0;32m
-BLUE=\033[0;34m
-RESET=\033[0m
-
-SHELL := /bin/bash
-.SHELLFLAGS := -eu -o pipefail -c
-
-.DEFAULT_GOAL := help
-
-# =============================================================================
-# Help
-# =============================================================================
-
+# Default target
 help: ## Show this help
-	@echo -e "$(BLUE)cloud-lab$(RESET) - Multi-Cloud Infrastructure"
+	@echo "cloud-lab - Multi-Cloud Infrastructure"
 	@echo ""
-	@echo "Usage: make [target] [CLOUD=aws|gcp|azure|oracle] [SERVICE=...]"
+	@echo "Usage: make [target] [CLOUD=aws|gcp|azure|oracle] [SERVICE=path] [ENV=dev|staging|prod]"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
-		awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(RESET) %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 
-# =============================================================================
-# Global Operations
-# =============================================================================
+# Cloud context switching
+aws: ## Switch to AWS context
+	@./scripts/cloud.switch.sh --cloud aws
+	@echo "Switched to AWS context"
 
-lint: ## Run linters (Terraform, Shell, Security)
-	@echo -e "$(BLUE)Running Terraform format check...$(RESET)"
-	@terraform fmt -check -recursive
-	@echo -e "$(BLUE)Running TFLint...$(RESET)"
-	@tflint --recursive --config .tflint.hcl
-	@echo -e "$(BLUE)Running ShellCheck...$(RESET)"
-	@find . -name "*.sh" -not -path "*/.git/*" -type f -exec shellcheck {} +
-	@echo -e "$(BLUE)Running tfsec...$(RESET)"
-	@tfsec . 
-	@echo -e "$(BLUE)Running Checkov...$(RESET)"
-	@checkov -d . --config-file .checkov.yml
+gcp: ## Switch to GCP context
+	@./scripts/cloud.switch.sh --cloud gcp
+	@echo "Switched to GCP context"
 
-format: ## Format all Terraform files
-	@echo -e "$(BLUE)Formatting Terraform files...$(RESET)"
-	@terraform fmt -recursive
+azure: ## Switch to Azure context
+	@./scripts/cloud.switch.sh --cloud azure
+	@echo "Switched to Azure context"
 
-docs: ## Generate documentation
-	@echo -e "$(BLUE)Generating Terraform docs...$(RESET)"
-	@find . -name "*.tf" -not -path "*/.git/*" -not -path "*/.terraform/*" -exec dirname {} \; | sort -u | xargs -I{} terraform-docs markdown table {} --output-file {}/README.md
+oracle: ## Switch to Oracle context
+	@./scripts/cloud.switch.sh --cloud oracle
+	@echo "Switched to Oracle context"
 
-test: ## Run all tests
-	@echo -e "$(BLUE)Running Terratest...$(RESET)"
-	@cd tests && go test -v ./...
+# Core operations
+init: ## Initialize new service: make init CLOUD=aws CATEGORY=compute NAME=my-service
+	@./scripts/cloud.init.sh --cloud $(CLOUD) --category $(CATEGORY) --name $(NAME)
 
-clean: ## Clean up Terraform artifacts
-	@echo -e "$(BLUE)Cleaning...$(RESET)"
-	@find . -name "*.tfplan" -delete
-	@find . -name ".terraform" -type d -exec rm -rf {} +
-	@find . -name ".terraform.lock.hcl" -delete
+provision: ## Provision infrastructure: make provision CLOUD=aws SERVICE=compute/ecs ENV=dev
+	@./scripts/cloud.provision.sh --cloud $(CLOUD) --service $(SERVICE) --env $(ENV)
 
-# =============================================================================
-# Cloud Specific Shortcuts
-# =============================================================================
+plan: ## Plan infrastructure: make plan CLOUD=aws SERVICE=compute/ecs ENV=dev
+	@./scripts/cloud.provision.sh --cloud $(CLOUD) --service $(SERVICE) --env $(ENV) --plan-only
 
-aws-init: ## Initialize AWS Terraform
-	@$(MAKE) -C aws init
+destroy: ## Destroy infrastructure: make destroy CLOUD=aws SERVICE=compute/ecs ENV=dev
+	@./scripts/cloud.provision.sh --cloud $(CLOUD) --service $(SERVICE) --env $(ENV) --destroy
 
-aws-plan: ## Plan AWS Terraform (requires path via arguments or runs in aws root)
-	@$(MAKE) -C aws plan
+# Testing
+test: ## Run tests: make test CLOUD=aws SERVICE=compute/ecs
+	@./scripts/cloud.test.sh --cloud $(CLOUD) --service $(SERVICE)
 
-aws-test: ## Run AWS tests
-	@$(MAKE) -C aws test
+test-all: ## Run all tests for a cloud: make test-all CLOUD=aws
+	@./scripts/cloud.test.sh --cloud $(CLOUD) --all
 
-# Add similar targets for other clouds as they become active
+# Quality and security
+lint: ## Run linters on Terraform files
+	@terraform fmt -check -recursive $(CLOUD)/
+	@tflint --recursive $(CLOUD)/
+
+security: ## Run security scans: make security CLOUD=aws SERVICE=compute/ecs
+	@./scripts/cloud.security.sh --cloud $(CLOUD) --service $(SERVICE)
+
+security-all: ## Run security scans for entire cloud: make security-all CLOUD=aws
+	@./scripts/cloud.security.sh --cloud $(CLOUD) --all
+
+# Documentation
+docs: ## Generate documentation: make docs CLOUD=aws SERVICE=compute/ecs
+	@./scripts/cloud.docs.sh --cloud $(CLOUD) --service $(SERVICE)
+
+docs-all: ## Generate all documentation: make docs-all CLOUD=aws
+	@./scripts/cloud.docs.sh --cloud $(CLOUD) --all
+
+# Cost analysis
+cost: ## Show cost analysis: make cost CLOUD=aws
+	@./scripts/cloud.cost.sh --cloud $(CLOUD) --timeframe 30d
+
+cost-estimate: ## Estimate costs from plan: make cost-estimate CLOUD=aws SERVICE=compute/ecs
+	@./scripts/cloud.cost.sh --cloud $(CLOUD) --estimate --service $(SERVICE)
+
+# Utilities
+fmt: ## Format all Terraform files
+	@terraform fmt -recursive .
+
+validate: ## Validate Terraform files: make validate CLOUD=aws SERVICE=compute/ecs
+	@cd $(CLOUD)/$(SERVICE)/infrastructure && terraform validate
+
+clean: ## Clean Terraform cache and lock files
+	@find . -type d -name ".terraform" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type f -name ".terraform.lock.hcl" -delete 2>/dev/null || true
+	@echo "Cleaned Terraform cache files"
+
+# Status
+status: ## Show current cloud context
+	@./scripts/cloud.switch.sh --show

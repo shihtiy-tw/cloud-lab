@@ -1,17 +1,14 @@
 # cloud-lab Agent Context
 
-**Domain**: Multi-cloud infrastructure and patterns  
-**Location**: `/home/yst/Labs/cloud-lab`  
-**Type**: Monorepo (AWS, GCP, Azure, Oracle)
+**Domain**: Multi-cloud infrastructure and patterns**Location**: `/home/yst/Labs/cloud-lab`**Type**: Monorepo (AWS, GCP, Azure, Oracle)
 
----
+------------------------------------------------------------------------
 
 ## Current Focus
 
-> 🎯 **AWS Services → Migrated from aws-lab**
-> 🔜 **GCP, Azure, Oracle → Future expansion**
+> 🎯 **AWS Services → Migrated from aws-lab** 🔜 **GCP, Azure, Oracle → Future expansion**
 
----
+------------------------------------------------------------------------
 
 ## YOU ARE HERE
 
@@ -51,7 +48,7 @@ cloud-lab/
     └── utils/       # Helper tools
 ```
 
----
+------------------------------------------------------------------------
 
 ## Structure
 
@@ -59,18 +56,20 @@ cloud-lab/
 
 Each cloud provider (`aws/`, `gcp/`, `azure/`, `oracle/`) follows a consistent structure:
 
-| Directory | Purpose |
-|-----------|---------|
-| `compute/` | VM instances, containers, serverless |
-| `storage/` | Object storage, file systems, block storage |
-| `database/` | Managed databases, NoSQL services |
-| `networking/` | VPC/VNet, DNS, load balancers, CDN |
-| `security/` | IAM, encryption, secrets management |
-| `monitoring/` | Metrics, logging, tracing, alerting |
+| Directory     | Purpose                                     |
+| ------------- | ------------------------------------------- |
+| `compute/`    | VM instances, containers, serverless        |
+| `storage/`    | Object storage, file systems, block storage |
+| `database/`   | Managed databases, NoSQL services           |
+| `networking/` | VPC/VNet, DNS, load balancers, CDN          |
+| `security/`   | IAM, encryption, secrets management         |
+| `monitoring/` | Metrics, logging, tracing, alerting         |
+
 
 ### Service Organization
 
 Each service has:
+
 - `infrastructure/` - IaC configs (Terraform, CloudFormation, etc.)
 - `scenarios/` - Real-world usage patterns and examples
 - `tests/` - Integration and unit tests
@@ -79,23 +78,24 @@ Each service has:
 
 ### Shared Resources
 
-| Directory | Purpose |
-|-----------|---------|
-| `shared/modules/` | Reusable IaC modules across clouds |
-| `shared/patterns/` | Multi-cloud architecture patterns |
-| `shared/utils/` | Cross-cloud helper tools |
-| `docs/` | Documentation and guides |
-| `examples/` | Quick start examples |
-| `scripts/` | Automation scripts |
-| `tests/` | Integration tests |
+| Directory          | Purpose                            |
+| ------------------ | ---------------------------------- |
+| `shared/modules/`  | Reusable IaC modules across clouds |
+| `shared/patterns/` | Multi-cloud architecture patterns  |
+| `shared/utils/`    | Cross-cloud helper tools           |
+| `docs/`            | Documentation and guides           |
+| `examples/`        | Quick start examples               |
+| `scripts/`         | Automation scripts                 |
+| `tests/`           | Integration tests                  |
 
----
+
+------------------------------------------------------------------------
 
 ## Quick Start
 
 ### AWS (Current)
 
-```bash
+``` bash
 # ECS Fargate scenario
 cd aws/compute/ecs/scenarios/ecs-fargate-service-with-alb
 terraform init && terraform plan
@@ -111,7 +111,7 @@ go test -v ./...
 
 ### GCP (Future)
 
-```bash
+``` bash
 # GKE scenario (example)
 cd gcp/compute/gke/scenarios/basic-cluster
 terraform init && terraform plan
@@ -119,7 +119,7 @@ terraform init && terraform plan
 
 ### Azure (Future)
 
-```bash
+``` bash
 # AKS scenario (example)
 cd azure/compute/aks/scenarios/basic-cluster
 terraform init && terraform plan
@@ -127,24 +127,25 @@ terraform init && terraform plan
 
 ### Oracle (Future)
 
-```bash
+``` bash
 # OKE scenario (example)
 cd oracle/compute/oke/scenarios/basic-cluster
 terraform init && terraform plan
 ```
 
----
+------------------------------------------------------------------------
 
 ## Lab Sessions
 
-| Date | Focus | Notes |
-|------|-------|-------|
-| 2026-02-01 | Initial setup | Migrated from aws-lab |
-| Future | GCP expansion | GKE, Cloud Run scenarios |
-| Future | Azure expansion | AKS, Container Instances |
-| Future | Oracle expansion | OKE, Autonomous DB |
+| Date       | Focus            | Notes                    |
+| ---------- | ---------------- | ------------------------ |
+| 2026-02-01 | Initial setup    | Migrated from aws-lab    |
+| Future     | GCP expansion    | GKE, Cloud Run scenarios |
+| Future     | Azure expansion  | AKS, Container Instances |
+| Future     | Oracle expansion | OKE, Autonomous DB       |
 
----
+
+------------------------------------------------------------------------
 
 ## Context Sources
 
@@ -153,7 +154,7 @@ terraform init && terraform plan
 - Each cloud's README.md - Cloud-specific context
 - Each service's README.md - Service-specific context
 
----
+------------------------------------------------------------------------
 
 ## 12-Factor Compliance
 
@@ -164,31 +165,35 @@ terraform init && terraform plan
 - **Configuration**: Environment-specific variables
 - **Cloud-agnostic patterns**: Where possible
 
----
+------------------------------------------------------------------------
 
 ## Technology Stack
 
 ### Infrastructure as Code
+
 - **Terraform**: Primary IaC tool across all clouds
 - **CloudFormation**: AWS native (where needed)
 - **ARM Templates**: Azure native (where needed)
 - **Deployment Manager**: GCP native (where needed)
 
 ### Testing
+
 - **Terratest**: Go-based infrastructure testing
 - **Go**: Test framework and utilities
 - **Shell**: Integration test scripts
 
 ### Automation
+
 - **Make**: Task automation
 - **Shell scripts**: Helper utilities
 - **CI/CD**: GitHub Actions (future)
 
----
+------------------------------------------------------------------------
 
 ## Cloud Provider Status
 
 ### ✅ AWS (Active)
+
 - **Compute**: ECS (Fargate, EC2), Lambda placeholders
 - **Storage**: S3, EFS scenarios
 - **Database**: RDS scenarios
@@ -197,6 +202,7 @@ terraform init && terraform plan
 - **Testing**: Full Terratest suite
 
 ### 🔜 GCP (Planned)
+
 - **Compute**: GKE, Cloud Run, GCE
 - **Storage**: GCS, Filestore
 - **Database**: Cloud SQL, Firestore, Spanner
@@ -204,6 +210,7 @@ terraform init && terraform plan
 - **Monitoring**: Cloud Monitoring, Logging
 
 ### 🔜 Azure (Planned)
+
 - **Compute**: AKS, Container Instances, VMs
 - **Storage**: Blob Storage, Files, Disks
 - **Database**: SQL Database, Cosmos DB
@@ -211,24 +218,27 @@ terraform init && terraform plan
 - **Monitoring**: Azure Monitor, Application Insights
 
 ### 🔜 Oracle (Planned)
+
 - **Compute**: OKE, OCI Compute
 - **Storage**: Object Storage, Block Volumes
 - **Database**: Autonomous Database, MySQL
 - **Networking**: VCN, Load Balancer
 - **Monitoring**: OCI Monitoring, Logging
 
----
+------------------------------------------------------------------------
 
 ## Commands
 
 ### AWS
-```bash
+
+``` bash
 # See AWS-specific Makefile
 cd aws && make help
 ```
 
 ### Future - Multi-cloud
-```bash
+
+``` bash
 # Switch cloud context
 ./scripts/switch-cloud.sh aws|gcp|azure|oracle
 
@@ -237,9 +247,39 @@ make deploy CLOUD=aws SERVICE=ecs ENV=dev
 
 # Test specific cloud
 make test CLOUD=gcp SERVICE=gke
+=======
+See: `.opencode/command/*.md` for full command documentation
+
+### Speckit (Spec-Driven Workflow)
+- `speckit.specify` - Create new specifications
+- `speckit.plan` - Create implementation plans
+- `speckit.tasks` - Generate task lists
+- `speckit.taskstovibe` - Sync tasks to Vibe Kanban
+- `speckit.implement` - Execute implementation
+
+### Cloud Operations (CSP-Aware)
+```bash
+# Switch cloud context
+make aws                    # or: make gcp, make azure, make oracle
+
+# Provision infrastructure
+make provision CLOUD=aws SERVICE=compute/ecs ENV=dev
+
+# Run tests
+make test CLOUD=aws SERVICE=compute/ecs
+
+# Security scan
+make security CLOUD=aws SERVICE=compute/ecs
+
+# Cost analysis
+make cost CLOUD=aws
+
+# Initialize new service
+make init CLOUD=aws CATEGORY=compute NAME=my-service
+>>>>>>> c735689 (Initialize cloud-lab repository with AWS infrastructure and scenarios)
 ```
 
----
+------------------------------------------------------------------------
 
 ## Safety Rules
 
@@ -254,7 +294,7 @@ make test CLOUD=gcp SERVICE=gke
 - Monitor cloud costs actively
 - Use cloud-specific best practices for security
 
----
+------------------------------------------------------------------------
 
 ## Migration Notes
 
@@ -263,6 +303,7 @@ make test CLOUD=gcp SERVICE=gke
 **Date**: 2026-02-01
 
 **What was migrated**:
+
 - All compute/ecs infrastructure and scenarios
 - Shared modules (VPC, ALB, ECS task, IAM roles, ECR)
 - Storage scenarios (S3, EFS)
@@ -272,11 +313,12 @@ make test CLOUD=gcp SERVICE=gke
 - Test suite
 
 **What changed**:
+
 - Location: `/home/yst/Labs/aws-lab` → `/home/yst/Labs/cloud-lab/aws`
 - Structure: Now part of multi-cloud monorepo
 - Future: Will add GCP, Azure, Oracle alongside AWS
 
----
+------------------------------------------------------------------------
 
 ## Related Resources
 
@@ -285,14 +327,14 @@ make test CLOUD=gcp SERVICE=gke
 - Shared Modules: [[shared/modules](file:///home/yst/Labs/cloud-lab/shared/modules)]
 - Architecture Patterns: [[shared/patterns](file:///home/yst/Labs/cloud-lab/shared/patterns)]
 
----
+------------------------------------------------------------------------
 
 ## Next Steps
 
-1. ✅ Migrate aws-lab content
-2. ⬜ Create GCP foundational infrastructure
-3. ⬜ Create Azure foundational infrastructure
-4. ⬜ Create Oracle foundational infrastructure
-5. ⬜ Develop cross-cloud patterns
-6. ⬜ Implement multi-cloud cost tracking
-7. ⬜ Create unified CLI tool
+1.  ✅ Migrate aws-lab content
+2.  ⬜ Create GCP foundational infrastructure
+3.  ⬜ Create Azure foundational infrastructure
+4.  ⬜ Create Oracle foundational infrastructure
+5.  ⬜ Develop cross-cloud patterns
+6.  ⬜ Implement multi-cloud cost tracking
+7.  ⬜ Create unified CLI tool

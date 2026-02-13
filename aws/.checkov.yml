@@ -1,0 +1,50 @@
+# Checkov Configuration for aws-lab
+# https://www.checkov.io/
+
+---
+# Framework to scan
+framework:
+  - terraform
+
+# Compact output
+compact: true
+
+# Directory to scan
+directory:
+  - .
+
+# Skip specific checks (with justification)
+skip-check:
+  # CKV_AWS_144: Ensure S3 bucket has cross-region replication enabled
+  # Justification: Not needed for lab environments
+  - CKV_AWS_144
+
+  # CKV_AWS_18: Ensure AWS access logging is enabled on S3 bucket
+  # Justification: Optional for lab/demo environments
+  # - CKV_AWS_18
+
+# External checks (custom policies)
+# external-checks-dir:
+#   - .checkov/custom
+
+# Exclude paths
+skip-path:
+  - examples/
+  - tests/fixtures/
+  - .terraform/
+
+# Output format
+output: cli
+
+# Soft fail
+soft-fail: false
+
+# Download external modules for scanning
+download-external-modules: true
+
+# Check for updates
+evaluate-variables: true
+# Specific resource types to check
+# check:
+#   - CKV_AWS_*
+#   - CKV_TF_*
