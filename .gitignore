@@ -116,6 +116,9 @@ site/
 .local/
 *.local
 
+# Active cloud provider context (written by scripts/cloud.switch.sh)
+.cloud-context
+
 # Backup files
 *.bak
 *.backup

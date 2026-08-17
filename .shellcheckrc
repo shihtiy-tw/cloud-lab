@@ -15,9 +15,21 @@ disable=SC1090
 # SC1091: Not following sourced files
 disable=SC1091
 
+# SC2310/SC2311/SC2312: set -e is disabled inside a function called in a
+# condition. The scripts/cloud.*.sh commands deliberately use
+# `helper || exit $?` so helpers can return the documented exit codes
+# (see .specify/002-scripts/data-model.md) instead of aborting mid-function.
+disable=SC2310
+disable=SC2311
+disable=SC2312
+
 # Shell options
 shell=bash
 
 # External sources
+# external-sources is required for source-path below to have any effect; without
+# it, sourced libraries are not read and every helper they define looks unassigned
+# (SC2154) when a script is checked on its own, as pre-commit does.
+external-sources=true
 source-path=SCRIPTDIR
 source-path=./shared

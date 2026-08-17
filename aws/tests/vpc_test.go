@@ -17,7 +17,7 @@ func TestVPCValidate(t *testing.T) {
 	config := helpers.NewTestConfig()
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../shared/vpc",
+		TerraformDir: "../shared/modules/vpc",
 		Vars: map[string]interface{}{
 			"project_name": config.ResourceName("test"),
 			"environment":  config.Environment,
@@ -36,7 +36,7 @@ func TestVPCPlan(t *testing.T) {
 	config := helpers.NewTestConfig()
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../shared/vpc",
+		TerraformDir: "../shared/modules/vpc",
 		Vars: map[string]interface{}{
 			"project_name": config.ResourceName("test"),
 			"environment":  config.Environment,
@@ -62,7 +62,7 @@ func TestVPCIntegration(t *testing.T) {
 	config := helpers.NewTestConfig()
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../shared/vpc",
+		TerraformDir: "../shared/modules/vpc",
 		Vars: map[string]interface{}{
 			"project_name": config.ResourceName("test"),
 			"environment":  config.Environment,

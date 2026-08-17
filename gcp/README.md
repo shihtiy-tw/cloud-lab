@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 # GCP Infrastructure
 
 🔜 **Coming Soon**

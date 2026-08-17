@@ -236,21 +236,8 @@ terraform init && terraform plan
 cd aws && make help
 ```
 
-### Future - Multi-cloud
-
-``` bash
-# Switch cloud context
-./scripts/switch-cloud.sh aws|gcp|azure|oracle
-
-# Deploy to specific cloud
-make deploy CLOUD=aws SERVICE=ecs ENV=dev
-
-# Test specific cloud
-make test CLOUD=gcp SERVICE=gke
-=======
-See: `.opencode/command/*.md` for full command documentation
-
 ### Speckit (Spec-Driven Workflow)
+
 - `speckit.specify` - Create new specifications
 - `speckit.plan` - Create implementation plans
 - `speckit.tasks` - Generate task lists
@@ -258,12 +245,16 @@ See: `.opencode/command/*.md` for full command documentation
 - `speckit.implement` - Execute implementation
 
 ### Cloud Operations (CSP-Aware)
-```bash
+
+``` bash
 # Switch cloud context
 make aws                    # or: make gcp, make azure, make oracle
+make status                 # show the active context
 
 # Provision infrastructure
+make plan CLOUD=aws SERVICE=compute/ecs ENV=dev
 make provision CLOUD=aws SERVICE=compute/ecs ENV=dev
+make destroy CLOUD=aws SERVICE=compute/ecs ENV=dev
 
 # Run tests
 make test CLOUD=aws SERVICE=compute/ecs
@@ -276,8 +267,11 @@ make cost CLOUD=aws
 
 # Initialize new service
 make init CLOUD=aws CATEGORY=compute NAME=my-service
->>>>>>> c735689 (Initialize cloud-lab repository with AWS infrastructure and scenarios)
 ```
+
+Every target above is a thin wrapper over `scripts/cloud.*.sh`; each script
+takes `--help`. See `scripts/README.md` for the CLI contract and
+`.opencode/command/*.md` for full command documentation.
 
 ------------------------------------------------------------------------
 
