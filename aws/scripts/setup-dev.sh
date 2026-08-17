@@ -79,7 +79,7 @@ get_version() {
 check_tool() {
   local tool="$1"
   local required="${2:-true}"
-  
+
   if check_command "$tool"; then
     local version
     version=$(get_version "$tool")
@@ -99,7 +99,7 @@ check_tool() {
 main() {
   local skip_optional=false
   local check_only=false
-  
+
   while [[ $# -gt 0 ]]; do
     case $1 in
       --help) show_help; exit 0 ;;
@@ -109,17 +109,17 @@ main() {
       *) log_error "Unknown option: $1"; exit 1 ;;
     esac
   done
-  
+
   log_section "aws-lab Development Environment Setup"
-  
+
   local has_errors=false
-  
+
   log_section "Required Tools"
   check_tool "terraform" "true" || has_errors=true
   check_tool "aws" "true" || has_errors=true
   check_tool "tflint" "true" || has_errors=true
   check_tool "tfsec" "true" || has_errors=true
-  
+
   if [[ "$skip_optional" != "true" ]]; then
     log_section "Optional Tools"
     check_tool "terraform-docs" "false" || true
@@ -128,7 +128,7 @@ main() {
     check_tool "checkov" "false" || true
     check_tool "go" "false" || true
   fi
-  
+
   if [[ "$check_only" == "true" ]]; then
     if [[ "$has_errors" == "true" ]]; then
       log_error "Some required tools are missing!"
@@ -137,14 +137,14 @@ main() {
     log_success "All required tools installed!"
     exit 0
   fi
-  
+
   if [[ "$has_errors" == "true" ]]; then
     log_error "Cannot continue: required tools missing."
     exit 1
   fi
-  
+
   log_section "Configuring Environment"
-  
+
   # Check AWS credentials
   log_info "Checking AWS credentials..."
   if aws sts get-caller-identity &>/dev/null; then
@@ -154,7 +154,7 @@ main() {
   else
     log_warn "AWS credentials not configured. Run 'aws configure'"
   fi
-  
+
   # Install pre-commit hooks
   if check_command "pre-commit"; then
     log_info "Installing pre-commit hooks..."
@@ -163,14 +163,14 @@ main() {
     pre-commit install --hook-type commit-msg || true
     log_success "Pre-commit hooks installed"
   fi
-  
+
   # Initialize TFLint plugins
   log_info "Initializing TFLint plugins..."
   cd "$PROJECT_ROOT"
   tflint --init || log_warn "TFLint init failed (plugins may not install)"
-  
+
   log_section "Setup Complete"
-  
+
   echo "Your development environment is ready!"
   echo ""
   echo "Quick start:"

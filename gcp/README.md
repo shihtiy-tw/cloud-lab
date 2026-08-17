@@ -50,7 +50,7 @@ This directory will contain Google Cloud Platform infrastructure patterns and sc
 
 Will follow the same pattern as AWS:
 
-```
+```text
 gcp/
 ├── compute/
 │   ├── gke/
@@ -78,8 +78,8 @@ gcp/
 
 If you'd like to contribute GCP scenarios, please:
 
-1.  Follow the established cloud-lab structure
-2.  Include comprehensive documentation
-3.  Add Terraform modules and scenarios
-4.  Include integration tests
-5.  Follow GCP best practices
+1. Follow the established cloud-lab structure
+2. Include comprehensive documentation
+3. Add Terraform modules and scenarios
+4. Include integration tests
+5. Follow GCP best practices

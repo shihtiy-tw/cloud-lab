@@ -5,11 +5,11 @@
 # Minimum severity to report
 minimum_severity: MEDIUM
 
-# Exclude specific rules (with justification)
-exclude:
-  # AWS004: Publicly accessible security group (sometimes needed for demos)
-  # Note: Re-enable for production deployments
-  # - aws-ec2-no-public-ingress-sgr
+# Exclude specific rules (with justification).
+# Nothing is excluded today. Example, for demos that need public ingress:
+#   - aws-ec2-no-public-ingress-sgr
+# Re-enable any such exclusion before a production deployment.
+exclude: []
 
 # Custom checks (if any)
 custom_checks_dir: .tfsec/custom
@@ -35,7 +35,6 @@ exclude_path:
   - tests/fixtures/
   - vendor/
 
-# Severity overrides
-severity_overrides:
-  # Override specific rules if needed
-  # aws-s3-enable-bucket-logging: LOW
+# Severity overrides. Example:
+#   aws-s3-enable-bucket-logging: LOW
+severity_overrides: {}

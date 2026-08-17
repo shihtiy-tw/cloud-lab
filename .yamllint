@@ -1,0 +1,29 @@
+# yamllint configuration for cloud-lab
+# https://yamllint.readthedocs.io/en/stable/configuration.html
+#
+# The pre-commit hook runs with --strict, so warnings fail too; every rule here
+# is therefore either an error we want or explicitly relaxed.
+---
+extends: default
+
+rules:
+  # Tables of provider settings and long GitHub Actions `run:` lines routinely
+  # exceed 80 columns.
+  line-length:
+    max: 120
+    allow-non-breakable-words: true
+
+  # GitHub Actions uses `on:` as a key, which yamllint reads as the boolean
+  # `true` unless key checking is off.
+  truthy:
+    check-keys: false
+
+  # `.terraform-docs.yml` and friends omit the leading `---`.
+  document-start: disable
+
+  comments:
+    min-spaces-from-content: 1
+
+  indentation:
+    spaces: 2
+    indent-sequences: consistent

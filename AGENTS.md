@@ -12,7 +12,7 @@
 
 ## YOU ARE HERE
 
-```
+```text
 cloud-lab/
 ├── aws/ ← 🔵 ACTIVE (migrated from aws-lab)
 │   ├── compute/     # ECS, EC2, Lambda
@@ -65,7 +65,6 @@ Each cloud provider (`aws/`, `gcp/`, `azure/`, `oracle/`) follows a consistent s
 | `security/`   | IAM, encryption, secrets management         |
 | `monitoring/` | Metrics, logging, tracing, alerting         |
 
-
 ### Service Organization
 
 Each service has:
@@ -87,7 +86,6 @@ Each service has:
 | `examples/`        | Quick start examples               |
 | `scripts/`         | Automation scripts                 |
 | `tests/`           | Integration tests                  |
-
 
 ------------------------------------------------------------------------
 
@@ -143,7 +141,6 @@ terraform init && terraform plan
 | Future     | GCP expansion    | GKE, Cloud Run scenarios |
 | Future     | Azure expansion  | AKS, Container Instances |
 | Future     | Oracle expansion | OKE, Autonomous DB       |
-
 
 ------------------------------------------------------------------------
 
@@ -281,10 +278,10 @@ takes `--help`. See `scripts/README.md` for the CLI contract and
 - Backup before destructive operations
 - Test in dev/sandbox accounts first
 - Require confirmation for:
-  - Resource deletion
-  - Production deployments
-  - Cross-cloud operations
-  - Cost-intensive resources
+    - Resource deletion
+    - Production deployments
+    - Cross-cloud operations
+    - Cost-intensive resources
 - Monitor cloud costs actively
 - Use cloud-specific best practices for security
 
@@ -325,10 +322,10 @@ takes `--help`. See `scripts/README.md` for the CLI contract and
 
 ## Next Steps
 
-1.  ✅ Migrate aws-lab content
-2.  ⬜ Create GCP foundational infrastructure
-3.  ⬜ Create Azure foundational infrastructure
-4.  ⬜ Create Oracle foundational infrastructure
-5.  ⬜ Develop cross-cloud patterns
-6.  ⬜ Implement multi-cloud cost tracking
-7.  ⬜ Create unified CLI tool
+1. ✅ Migrate aws-lab content
+2. ⬜ Create GCP foundational infrastructure
+3. ⬜ Create Azure foundational infrastructure
+4. ⬜ Create Oracle foundational infrastructure
+5. ⬜ Develop cross-cloud patterns
+6. ⬜ Implement multi-cloud cost tracking
+7. ⬜ Create unified CLI tool
