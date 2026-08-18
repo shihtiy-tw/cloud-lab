@@ -3,6 +3,19 @@ Description=Mount the dev-vm persistent home disk and seed it on first boot
 Documentation=https://github.com/shihtiy-tw/dotfiles
 # Must complete before anyone can log in, otherwise a session could land in the
 # unseeded home directory and then have the disk mounted out from under it.
+#
+# Running this early has one consequence each cloud's Terraform must handle: on
+# the very first boot, /etc/dev-vm/seed-home.env does not exist yet. User data
+# runs later than this unit in every cloud (GCE's google-startup-scripts.service
+# is well after multi-user.target; cloud-init's later stages likewise), so the
+# first run falls back to "first blank disk" instead of the configured device.
+#
+# That fallback usually picks correctly, but it is a guess. The contract is
+# therefore: after writing the env files, the cloud's boot script must run
+#   systemctl restart dev-vm-seed-home.service
+# which is safe and idempotent -- Type=oneshot, and the script leaves an already
+# seeded and mounted home untouched. Do not reorder this unit to wait for user
+# data; that would let a login land in the unseeded home.
 DefaultDependencies=no
 After=local-fs.target systemd-udev-settle.service
 Wants=systemd-udev-settle.service

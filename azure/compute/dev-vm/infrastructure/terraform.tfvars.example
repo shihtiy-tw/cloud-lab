@@ -1,7 +1,86 @@
 # Copy to terraform.tfvars (git-ignored) and adjust.
+
 project_name        = "my-app"
 environment         = "dev"
 location            = "eastus"
 owner               = "platform-team"
 cost_center         = "engineering"
 resource_group_name = "my-rg"
+
+# Create the resource group here rather than adopting an existing one.
+# create_resource_group = true
+
+# Leave empty to use ARM_SUBSCRIPTION_ID / the az CLI's current subscription.
+# subscription_id = "00000000-0000-0000-0000-000000000000"
+
+# --- The only credential on the box -------------------------------------------
+# Password authentication is disabled, so at least one key is required. Bastion
+# tunnels SSH to the VM's private address; this key never crosses the internet.
+ssh_public_keys = [
+  "ssh-ed25519 AAAA... you@example.com",
+]
+
+# --- Image --------------------------------------------------------------------
+# Pinned deliberately: source_image_id forces replacement, so "latest" would turn
+# every new `packer build` into a VM rebuild on the next apply. Bump this when you
+# want the new image.
+image_version = "0.1.0"
+# gallery_name                = "cloudlab"
+# gallery_resource_group_name = "cloud-lab-images"
+# gallery_image_name          = "dev-vm"
+#
+# Or bypass the gallery lookup entirely with the id `packer build` printed:
+# image_id = "/subscriptions/.../galleries/cloudlab/images/dev-vm/versions/0.1.0"
+
+# --- Bastion ------------------------------------------------------------------
+# Developer  free, browser-only, region-limited, one VM connection at a time
+# Basic      ~$140/month, dedicated instances, still browser-only
+# Standard   ~$140/month + scale units, and the only SKU where
+#            `az network bastion ssh` / scp / VS Code Remote-SSH work
+bastion_sku = "Developer"
+# bastion_scale_units = 2
+#
+# Set false when a Bastion already exists in this VNet -- one serves every VM in
+# it, and it is the expensive part.
+# create_bastion = true
+
+# --- Access -------------------------------------------------------------------
+# Entra object ids of the humans allowed on the box. Without at least one, nobody
+# has the role assignments Bastion needs. `az ad signed-in-user show --query id -o tsv`
+developer_principal_ids = [
+  # "00000000-0000-0000-0000-000000000000",
+]
+# developer_vm_login_role = "Virtual Machine Administrator Login"
+
+# Scoped permissions for the VM's own managed identity. Empty is the right
+# default; never Owner or Contributor at subscription scope.
+# identity_role_assignments = [
+#   {
+#     role_definition_name = "Key Vault Secrets User"
+#     scope                = "/subscriptions/.../resourceGroups/my-rg/providers/Microsoft.KeyVault/vaults/my-vault"
+#   },
+# ]
+
+# --- Cost control -------------------------------------------------------------
+auto_stop_enabled  = true
+auto_stop_time     = "2000"
+auto_stop_timezone = "UTC" # Windows timezone names, e.g. "Taipei Standard Time"
+# auto_stop_notification_enabled = true
+# auto_stop_notification_email   = "me@example.com"
+
+idle_shutdown_enabled = true
+idle_shutdown_minutes = 30
+
+# --- Machine ------------------------------------------------------------------
+# Prefer a size with no local temp disk (Dsv5, not Ddsv5); see the variable's
+# description for why the home-disk detection depends on it.
+# vm_size                        = "Standard_D2s_v5"
+# data_disk_size_gb              = 128
+# data_disk_storage_account_type = "Premium_LRS"
+
+# Requires the EncryptionAtHost feature registered on the subscription:
+#   az feature register --namespace Microsoft.Compute --name EncryptionAtHost
+# encryption_at_host_enabled = true
+
+# --- Network ------------------------------------------------------------------
+# vnet_cidr = "10.30.0.0/16"

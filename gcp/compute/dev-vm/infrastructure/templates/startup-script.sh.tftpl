@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+#
+# Rendered by gcp/compute/dev-vm Terraform and delivered as the instance's
+# metadata startup script. Do not edit on the box: GCE re-runs the startup script
+# on every boot, so local edits are overwritten at the next start.
+#
+# Its whole job is to hand the image's two boot scripts their configuration. The
+# scripts themselves are baked into the image by shared/bootstrap/install.sh and
+# are deliberately cloud-agnostic; everything cloud-specific -- above all the data
+# disk's device path -- arrives here.
+
+set -euo pipefail
+
+log() { printf '[dev-vm-startup] %s\n' "$*" >&2; }
+
+install -d -m 0755 /etc/dev-vm
+
+# ---------------------------------------------------------------------------
+# seed-home.sh configuration
+# ---------------------------------------------------------------------------
+#
+# DATA_DISK_DEVICE below is bound to the instance's attached_disk device_name.
+# /dev/disk/by-id/google-<device_name> is how the GCE guest environment exposes
+# an attached disk, so renaming the device_name in Terraform without changing
+# this path leaves seed-home.sh looking for a block device that does not exist --
+# and it fails loudly rather than guessing, by design.
+
+cat > /etc/dev-vm/seed-home.env << 'EOF'
+# Managed by Terraform (gcp/compute/dev-vm). Regenerated on every boot.
+TARGET_USER=${target_user}
+HOME_SEED_DIR=${home_seed_dir}
+FS_LABEL=${fs_label}
+DATA_DISK_DEVICE=${data_disk_device}
+EOF
+chmod 0644 /etc/dev-vm/seed-home.env
+
+# ---------------------------------------------------------------------------
+# idle-shutdown.sh configuration
+# ---------------------------------------------------------------------------
+#
+# CHECK_INTERVAL_MINUTES must match OnUnitActiveSec in
+# dev-vm-idle-shutdown.timer, which the image pins at 5min. The script counts
+# idle time in units of this interval, so a mismatch silently changes what
+# IDLE_MINUTES means.
+
+cat > /etc/dev-vm/idle-shutdown.env << 'EOF'
+# Managed by Terraform (gcp/compute/dev-vm). Regenerated on every boot.
+ENABLED=${idle_enabled}
+IDLE_MINUTES=${idle_minutes}
+CHECK_INTERVAL_MINUTES=${check_interval_minutes}
+LOAD_THRESHOLD=${load_threshold}
+IGNORE_CONTAINERS=${ignore_containers}
+EOF
+chmod 0644 /etc/dev-vm/idle-shutdown.env
+
+# ---------------------------------------------------------------------------
+# Re-run the home seeding with the config it should have had
+# ---------------------------------------------------------------------------
+#
+# Ordering problem worth stating plainly: dev-vm-seed-home.service runs
+# Before=sysinit.target, while GCE runs this script from
+# google-startup-scripts.service, which is ordered long after that. So on the
+# very first boot seed-home.sh has already run against the image's default
+# config, where DATA_DISK_DEVICE is unset and it falls back to "the first blank
+# disk". That fallback happens to be correct here -- the home disk is the only
+# non-boot disk attached -- but relying on it would break the moment a second
+# data disk appears.
+#
+# Restarting the unit now closes the gap deterministically. It is a Type=oneshot
+# unit and the script is idempotent: an already-mounted, already-seeded home is
+# detected and left alone, so this is safe on every boot and safe while someone
+# is logged in.
+if systemctl cat dev-vm-seed-home.service > /dev/null 2>&1; then
+  log "re-running dev-vm-seed-home with Terraform-provided configuration"
+  systemctl restart dev-vm-seed-home.service || log "WARNING: seed-home re-run failed; check journalctl -u dev-vm-seed-home"
+else
+  log "WARNING: dev-vm-seed-home.service is absent; is this the dev-vm image?"
+fi
+
+# The timer reads its env file on every invocation, so a changed threshold takes
+# effect without a restart. It still needs to be running at all.
+if systemctl cat dev-vm-idle-shutdown.timer > /dev/null 2>&1; then
+  systemctl enable --now dev-vm-idle-shutdown.timer > /dev/null 2>&1 || true
+fi
+
+log "done"

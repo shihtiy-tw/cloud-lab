@@ -1,0 +1,56 @@
+#cloud-config
+# Boot configuration for the dev-vm image.
+#
+# The image ships defaults for both files below (see shared/bootstrap/install.sh),
+# but leaves DATA_DISK_DEVICE unset because the device path is the one thing that
+# differs per cloud. This is where AWS fills it in. cloud-init truncates and
+# rewrites the files on every boot, so Terraform stays the source of truth for
+# these thresholds without an image rebuild.
+
+write_files:
+  # Read by dev-vm-seed-home.service (shared/bootstrap/seed-home.sh) to mount the
+  # persistent volume at the user's home and, on first boot only, restore the
+  # dotfiles home the image baked into HOME_SEED_DIR. Without the seed step the
+  # volume would mount over /home/${target_user} and hide everything the image
+  # installed.
+  - path: /etc/dev-vm/seed-home.env
+    owner: root:root
+    permissions: "0644"
+    content: |
+      TARGET_USER=${target_user}
+      HOME_SEED_DIR=${home_seed_dir}
+      FS_LABEL=${fs_label}
+      DATA_DISK_DEVICE=${data_disk_device}
+
+  # Read on every run by dev-vm-idle-shutdown.timer, so no restart is needed for
+  # a change here to take effect. CHECK_INTERVAL_MINUTES must match the timer's
+  # OnUnitActiveSec, since the script accumulates idle time in units of it.
+  - path: /etc/dev-vm/idle-shutdown.env
+    owner: root:root
+    permissions: "0644"
+    content: |
+      ENABLED=${idle_enabled}
+      IDLE_MINUTES=${idle_minutes}
+      CHECK_INTERVAL_MINUTES=5
+      LOAD_THRESHOLD=${idle_load_threshold}
+      IGNORE_CONTAINERS=${idle_ignore_containers}
+
+  # The AWS CLI resolves a region from IMDS only as a last resort and several
+  # tools in the dotfiles do not resolve one at all. Telling the shell where it
+  # is running costs one file.
+  - path: /etc/profile.d/dev-vm-region.sh
+    owner: root:root
+    permissions: "0644"
+    content: |
+      export AWS_REGION=${region}
+      export AWS_DEFAULT_REGION=${region}
+
+runcmd:
+  # dev-vm-seed-home.service is ordered Before=sysinit.target with
+  # DefaultDependencies=no, which puts it ahead of cloud-init on the very first
+  # boot -- so it ran before the file above existed and fell back to
+  # auto-detecting the single blank disk. That picks the right volume here, but
+  # re-running the unit now that DATA_DISK_DEVICE is explicit removes the reliance
+  # on that fallback. The script is idempotent: an already-mounted, already-seeded
+  # home is left untouched.
+  - [systemctl, restart, dev-vm-seed-home.service]

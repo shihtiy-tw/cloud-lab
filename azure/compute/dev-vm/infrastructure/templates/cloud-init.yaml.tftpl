@@ -1,0 +1,53 @@
+#cloud-config
+# Configuration for the two boot helpers baked into the image by
+# shared/bootstrap/install.sh. Terraform renders this and hands it to Azure as
+# base64 custom_data; the Azure datasource in cloud-init picks it up.
+#
+# This document only writes config. It installs nothing: everything the dev VM
+# needs is already in the gallery image, and a cloud-init that starts fetching
+# packages would defeat the point of having built one.
+#
+# Ordering caveat worth knowing. dev-vm-seed-home.service is ordered
+# Before=sysinit.target so no login can land in an unseeded home, and
+# cloud-init-local.service is ordered Before=sysinit.target too -- systemd is free
+# to run them in either order on first boot. If seed-home wins the race it runs
+# without DATA_DISK_DEVICE and falls back to "the first blank disk", so the
+# runcmd below re-runs it once the env file is in place. Re-running is safe:
+# seed-home.sh never reformats a disk that already has a filesystem, and it
+# mounts by UUID. Choosing a VM size with no local temp disk (see var.vm_size)
+# is what makes the fallback unambiguous in the first place.
+
+write_files:
+  - path: /etc/dev-vm/seed-home.env
+    owner: root:root
+    permissions: '0644'
+    content: |
+      # Managed by azure/compute/dev-vm. Edits here are lost on reprovision.
+      TARGET_USER=${target_user}
+      HOME_SEED_DIR=${home_seed_dir}
+      FS_LABEL=${fs_label}
+      # Azure surfaces data disks under /dev/disk/azure/scsi1/lunN, where N is the
+      # `lun` on the azurerm_virtual_machine_data_disk_attachment. This path and
+      # that attachment's lun = 0 are one fact written in two places; changing
+      # either alone leaves the home disk unmounted and the VM booting off the
+      # image's copy of the home directory, which looks like "my files are gone".
+      DATA_DISK_DEVICE=${data_disk_device}
+
+  - path: /etc/dev-vm/idle-shutdown.env
+    owner: root:root
+    permissions: '0644'
+    content: |
+      # Managed by azure/compute/dev-vm. Edits here are lost on reprovision.
+      ENABLED=${idle_enabled}
+      IDLE_MINUTES=${idle_minutes}
+      # Must match OnUnitActiveSec in dev-vm-idle-shutdown.timer.
+      CHECK_INTERVAL_MINUTES=${check_interval_minutes}
+      LOAD_THRESHOLD=${load_threshold}
+      IGNORE_CONTAINERS=${ignore_containers}
+
+runcmd:
+  # Converge both units against the config just written. `|| true` because a
+  # failure here must not fail the boot: the VM is still reachable over Bastion,
+  # which is how you would go in and diagnose it.
+  - systemctl restart dev-vm-seed-home.service || true
+  - systemctl restart dev-vm-idle-shutdown.timer || true

@@ -1,7 +1,34 @@
 # Copy to terraform.tfvars (git-ignored) and adjust.
-project_name        = "my-app"
-environment         = "dev"
-region              = "us-central1"
-owner               = "platform-team"
-cost_center         = "engineering"
-project_id          = "my-project-123"
+project_name = "my-app"
+environment  = "dev"
+region       = "us-central1"
+zone         = "us-central1-a"
+owner        = "platform-team"
+cost_center  = "engineering"
+project_id   = "my-project-123"
+
+# Without at least one principal here nobody can log in: there is no external IP
+# and no metadata SSH key to fall back on.
+developer_principals = ["user:you@example.com"]
+
+# Sizing
+machine_type   = "e2-standard-4"
+boot_disk_size = 50
+data_disk_size = 100
+
+# Pin the image once a build is known good. Leaving this empty resolves the
+# newest image in the family at plan time, which turns the next Packer build into
+# an instance replacement.
+# image_id = "projects/my-project-123/global/images/dev-vm-ubuntu2404-amd64-1-0-0-20260818-120000"
+
+# Cost controls. Cloud NAT is ~$32/month and runs whether or not the VM is up.
+enable_cloud_nat      = true
+idle_shutdown_enabled = true
+idle_minutes          = 30
+auto_stop_enabled     = true
+vm_stop_schedule      = "0 20 * * *"
+vm_start_schedule     = ""
+schedule_time_zone    = "Asia/Taipei"
+
+# Break-glass only. Flip to true for the length of a recovery, then flip it back.
+enable_serial_console = false

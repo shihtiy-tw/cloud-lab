@@ -1,6 +1,35 @@
 # Copy to terraform.tfvars (git-ignored) and adjust.
-project_name        = "my-app"
-environment         = "dev"
-region              = "us-east-1"
-owner               = "platform-team"
-cost_center         = "engineering"
+project_name = "cloud-lab"
+environment  = "dev"
+region       = "us-east-1"
+owner        = "shihtiy"
+cost_center  = "personal-lab"
+
+# Pin the image. `jq -r '.builds[-1].artifact_id' shared/packer/manifest.json`
+# prints "<region>:<ami-id>" from the last build; take the ami-id half. Leaving
+# this empty falls back to the newest AMI tagged image_version = ami_image_version,
+# which means a rebuild silently proposes replacing the VM.
+ami_id            = ""
+ami_image_version = "0.1.0"
+
+instance_type = "t3.large"
+
+# The disk that survives destroy.
+data_volume_size = 100
+
+# Nitro instance types (t3, m5, c6i, ...) see the volume here. Xen types (t2, m4)
+# see /dev/xvdf instead.
+data_disk_device = "/dev/nvme1n1"
+
+# On-box idle shutdown, read by shared/bootstrap/idle-shutdown.sh.
+idle_shutdown_enabled = true
+idle_minutes          = 30
+
+# Scheduled hard stop, as a backstop for a wedged box.
+auto_stop_enabled  = true
+auto_stop_cron     = "cron(0 21 ? * MON-FRI *)"
+auto_stop_timezone = "Asia/Taipei"
+
+# Session transcripts. CloudWatch is always on; S3 is for keeping them longer.
+session_log_retention_days = 30
+enable_session_log_bucket  = false
