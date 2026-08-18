@@ -82,7 +82,7 @@ world:
 | Cloud | Broker | Ingress rules on the VM | Broker cost |
 | ----- | ------ | ----------------------- | ----------- |
 | AWS | SSM Session Manager | none at all | $0 |
-| GCP | IAP TCP forwarding | one, from `35.235.240.0/20` | $0 |
+| GCP | IAP TCP forwarding | one, IAP range only | $0 |
 | Azure | Bastion (Developer SKU) | none (out-of-band) | $0 |
 
 Full details in [`.specify/003-dev-vm/`](.specify/003-dev-vm/) and each service's
