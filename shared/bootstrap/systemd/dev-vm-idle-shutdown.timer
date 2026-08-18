@@ -1,0 +1,16 @@
+[Unit]
+Description=Periodic idle check for the dev VM
+Documentation=file:///usr/local/sbin/dev-vm-idle-shutdown
+
+[Timer]
+# Give a fresh boot a grace period: someone just started this box on purpose,
+# and the idle counter starts at zero anyway.
+OnBootSec=15min
+# CHECK_INTERVAL_MINUTES in /etc/dev-vm/idle-shutdown.env must match this, since
+# the script accumulates idle time in units of that interval.
+OnUnitActiveSec=5min
+AccuracySec=1min
+Unit=dev-vm-idle-shutdown.service
+
+[Install]
+WantedBy=timers.target

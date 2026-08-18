@@ -1,0 +1,24 @@
+[Unit]
+Description=Mount the dev-vm persistent home disk and seed it on first boot
+Documentation=https://github.com/shihtiy-tw/dotfiles
+# Must complete before anyone can log in, otherwise a session could land in the
+# unseeded home directory and then have the disk mounted out from under it.
+DefaultDependencies=no
+After=local-fs.target systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+Before=sysinit.target systemd-user-sessions.service
+Conflicts=shutdown.target
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/dev-vm-seed-home
+# The disk may attach after boot begins; the script waits up to 60s internally.
+TimeoutStartSec=180
+# A failure here must not black-hole the boot -- the VM is still reachable over
+# the cloud's brokered path, which is how you would go in and fix it.
+SuccessExitStatus=0
+
+[Install]
+WantedBy=sysinit.target

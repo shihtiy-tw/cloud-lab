@@ -47,10 +47,17 @@ repos:
       - id: terraform_checkov
         args:
           - --args=--config-file __GIT_WORKING_DIR__/.checkov.yml
+      # Manual stage on purpose. infracost needs a (paid) API key and a network
+      # round-trip to price resources, and aws/scripts/setup-dev.sh already
+      # classifies it as an optional tool -- so a missing binary exited 127 and
+      # blocked every commit that touched a .tf file. Run it deliberately:
+      #   pre-commit run infracost_breakdown --hook-stage manual --all-files
+      # or via the repo's own wrapper, `make cost-estimate`.
       - id: infracost_breakdown
         args:
           - --args=--path .
         verbose: true
+        stages: [manual]
 
   # Shell script linting
   - repo: https://github.com/shellcheck-py/shellcheck-py

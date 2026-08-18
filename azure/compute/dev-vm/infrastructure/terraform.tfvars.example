@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars (git-ignored) and adjust.
+project_name        = "my-app"
+environment         = "dev"
+location            = "eastus"
+owner               = "platform-team"
+cost_center         = "engineering"
+resource_group_name = "my-rg"

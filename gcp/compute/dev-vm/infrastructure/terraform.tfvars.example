@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars (git-ignored) and adjust.
+project_name        = "my-app"
+environment         = "dev"
+region              = "us-central1"
+owner               = "platform-team"
+cost_center         = "engineering"
+project_id          = "my-project-123"

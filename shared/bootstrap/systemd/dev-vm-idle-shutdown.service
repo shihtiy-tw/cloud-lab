@@ -1,0 +1,9 @@
+[Unit]
+Description=Stop the dev VM when it has been idle
+Documentation=file:///usr/local/sbin/dev-vm-idle-shutdown
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/dev-vm-idle-shutdown
+# Never let a hung check hold a shutdown transaction open.
+TimeoutStartSec=60
