@@ -23,10 +23,10 @@ for family in "${families_array[@]}"; do
 
   # Export the task definition
   aws ecs describe-task-definition --task-definition "$task_def" \
-    --query "taskDefinition.{family:family, taskRoleArn:taskRoleArn, executionRoleArn:executionRoleArn, networkMode:networkMode, containerDefinitions:containerDefinitions, volumes:volumes, placementConstraints:placementConstraints, requiresCompatibilities:requiresCompatibilities, cpu:cpu, memory:memory, tags:tags, pidMode:pidMode, ipcMode:ipcMode, proxyConfiguration:proxyConfiguration}" | jq 'del(.[] | nulls)' >"$family"-task-def.json
+    --query "taskDefinition.{family:family, taskRoleArn:taskRoleArn, executionRoleArn:executionRoleArn, networkMode:networkMode, containerDefinitions:containerDefinitions, volumes:volumes, placementConstraints:placementConstraints, requiresCompatibilities:requiresCompatibilities, cpu:cpu, memory:memory, tags:tags, pidMode:pidMode, ipcMode:ipcMode, proxyConfiguration:proxyConfiguration}" | jq 'del(.[] | nulls)' > "$family"-task-def.json
 
   # Convert JSON to YAML
-  docker run -v "$PWD":/workdir mikefarah/yq -oy "$family"-task-def.json >"$family"-task-def.yaml
+  docker run -v "$PWD":/workdir mikefarah/yq -oy "$family"-task-def.json > "$family"-task-def.yaml
 
   echo "Exported $task_def to ${family}-task-def.json and ${family}-task-def.yaml"
 done

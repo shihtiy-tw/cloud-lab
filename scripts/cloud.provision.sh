@@ -32,7 +32,7 @@ declare -a EXTRA_VARS=()
 TMP_PLAN_DIR=""
 
 show_help() {
-  cat <<EOF
+  cat << EOF
 Usage: $(basename "$0") --cloud <provider> --service <path> --env <environment> [OPTIONS]
 
 Provision cloud infrastructure with Terraform. The plan is always generated and
@@ -160,9 +160,9 @@ cleanup() {
 # check_terraform_version - warn when older than the documented minimum
 check_terraform_version() {
   local version
-  version="$(terraform version -json 2>/dev/null |
-    grep -o '"terraform_version"[[:space:]]*:[[:space:]]*"[^"]*"' |
-    head -1 | sed 's/.*"\([0-9][^"]*\)"$/\1/')" || true
+  version="$(terraform version -json 2> /dev/null \
+    | grep -o '"terraform_version"[[:space:]]*:[[:space:]]*"[^"]*"' \
+    | head -1 | sed 's/.*"\([0-9][^"]*\)"$/\1/')" || true
   if [[ -z "${version}" ]]; then
     log_warn "could not determine the Terraform version; continuing"
     return 0
@@ -179,8 +179,8 @@ check_terraform_version() {
 # warn_on_local_state <dir> - flag stacks with no remote backend configured
 warn_on_local_state() {
   local dir="$1"
-  if grep -rlqs --include='*.tf' 'backend[[:space:]]*"' "${dir}" ||
-    grep -rlqs --include='*.tf' 'cloud[[:space:]]*{' "${dir}"; then
+  if grep -rlqs --include='*.tf' 'backend[[:space:]]*"' "${dir}" \
+    || grep -rlqs --include='*.tf' 'cloud[[:space:]]*{' "${dir}"; then
     return 0
   fi
   local backend
@@ -195,11 +195,11 @@ select_workspace() {
   local dir="$1"
   local name="$2"
   log_info "selecting Terraform workspace '${name}'"
-  if terraform -chdir="${dir}" workspace select "${name}" >/dev/null 2>&1; then
+  if terraform -chdir="${dir}" workspace select "${name}" > /dev/null 2>&1; then
     return 0
   fi
   log_info "workspace '${name}' does not exist; creating it"
-  if terraform -chdir="${dir}" workspace new "${name}" >/dev/null 2>&1; then
+  if terraform -chdir="${dir}" workspace new "${name}" > /dev/null 2>&1; then
     return 0
   fi
   log_warn "could not select or create workspace '${name}'; using the current workspace"
@@ -214,7 +214,7 @@ warn_workspace_convention() {
     return 0
   fi
   local current
-  current="$(terraform -chdir="${dir}" workspace show 2>/dev/null || printf 'unknown\n')"
+  current="$(terraform -chdir="${dir}" workspace show 2> /dev/null || printf 'unknown\n')"
   log_warn "this stack sets 'region = terraform.workspace': the workspace name IS the AWS region"
   log_warn "  active workspace: ${current}"
   if [[ -z "${WORKSPACE}" ]]; then

@@ -28,7 +28,7 @@ TIMEOUT="10m"
 PARALLEL=""
 
 show_help() {
-  cat <<EOF
+  cat << EOF
 Usage: $(basename "$0") --cloud <provider> --service <path> [OPTIONS]
        $(basename "$0") --cloud <provider> --all [OPTIONS]
 
@@ -121,7 +121,7 @@ find_go_modules() {
   fi
   find "${root}" -type f -name 'go.mod' \
     -not -path '*/vendor/*' \
-    -printf '%h\n' 2>/dev/null | sort -u
+    -printf '%h\n' 2> /dev/null | sort -u
 }
 
 # suite_pattern <module-dir> - the go test package pattern for the chosen suite
@@ -158,7 +158,7 @@ module_has_tests() {
     *) ;;
   esac
   local found
-  found="$(find "${scope}" -type f -name '*_test.go' -not -path '*/vendor/*' -print -quit 2>/dev/null || true)"
+  found="$(find "${scope}" -type f -name '*_test.go' -not -path '*/vendor/*' -print -quit 2> /dev/null || true)"
   [[ -n "${found}" ]]
 }
 

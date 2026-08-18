@@ -33,7 +33,7 @@ declare -a RAN_STATUS=()
 declare -a RAN_LOGS=()
 
 show_help() {
-  cat <<EOF
+  cat << EOF
 Usage: $(basename "$0") --cloud <provider> --service <path> [OPTIONS]
        $(basename "$0") --cloud <provider> --all [OPTIONS]
 
@@ -247,7 +247,7 @@ write_report() {
       done
       printf '  ]\n'
       printf '}\n'
-    } >"${target}"
+    } > "${target}"
   else
     {
       printf 'Security Scan Results - %s %s\n' "${CLOUD}" "${label}"
@@ -264,7 +264,7 @@ write_report() {
           cat "${log}"
         fi
       done
-    } >"${target}"
+    } > "${target}"
   fi
   log_success "report written to ${target}"
 }

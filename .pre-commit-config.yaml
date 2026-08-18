@@ -58,13 +58,27 @@ repos:
     hooks:
       - id: shellcheck
         args: ["--severity=warning"]
+        # Same reason as shfmt below: .specify/scripts/ is vendored from spec-kit
+        # upstream and is not ours to fix. Every shellcheck failure under
+        # --all-files came from these files; excluding them makes a repo-wide run
+        # meaningful instead of permanently red.
+        exclude: ^(aws/)?\.specify/scripts/
 
   # Shell script formatting
+  #
+  # -w is load-bearing. Without a write (-w) or diff (-d) flag, shfmt prints the
+  # formatted script to stdout and exits 0, so the hook passed unconditionally
+  # and never reformatted anything. -w makes it fix files in place; pre-commit
+  # then reports "files were modified by this hook" and fails the run.
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.7.0-4
     hooks:
       - id: shfmt
-        args: ["-i", "2", "-ci", "-bn", "-sr"]
+        args: ["-w", "-i", "2", "-ci", "-bn", "-sr"]
+        # .specify/scripts/ is vendored from spec-kit upstream. Reformatting it
+        # would conflict on every upstream refresh for no benefit, so it is
+        # excluded rather than churned.
+        exclude: ^(aws/)?\.specify/scripts/
 
   # YAML linting
   - repo: https://github.com/adrienverge/yamllint

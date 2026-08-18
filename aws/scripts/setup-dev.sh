@@ -57,19 +57,19 @@ EOF
 }
 
 check_command() {
-  command -v "$1" &>/dev/null
+  command -v "$1" &> /dev/null
 }
 
 get_version() {
   local cmd="$1"
   case "$cmd" in
-    terraform) terraform version -json 2>/dev/null | jq -r '.terraform_version' 2>/dev/null || terraform version | head -1 | awk '{print $2}' ;;
+    terraform) terraform version -json 2> /dev/null | jq -r '.terraform_version' 2> /dev/null || terraform version | head -1 | awk '{print $2}' ;;
     aws) aws --version 2>&1 | awk '{print $1}' | cut -d'/' -f2 ;;
     tflint) tflint --version | head -1 | awk '{print $3}' ;;
-    tfsec) tfsec --version 2>/dev/null | head -1 ;;
+    tfsec) tfsec --version 2> /dev/null | head -1 ;;
     terraform-docs) terraform-docs --version | awk '{print $3}' ;;
     infracost) infracost --version | awk '{print $2}' ;;
-    checkov) checkov --version 2>/dev/null ;;
+    checkov) checkov --version 2> /dev/null ;;
     pre-commit) pre-commit --version | awk '{print $2}' ;;
     go) go version | awk '{print $3}' | cut -c3- ;;
     *) echo "unknown" ;;
@@ -102,11 +102,26 @@ main() {
 
   while [[ $# -gt 0 ]]; do
     case $1 in
-      --help) show_help; exit 0 ;;
-      --version) echo "$VERSION"; exit 0 ;;
-      --skip-optional) skip_optional=true; shift ;;
-      --check-only) check_only=true; shift ;;
-      *) log_error "Unknown option: $1"; exit 1 ;;
+      --help)
+        show_help
+        exit 0
+        ;;
+      --version)
+        echo "$VERSION"
+        exit 0
+        ;;
+      --skip-optional)
+        skip_optional=true
+        shift
+        ;;
+      --check-only)
+        check_only=true
+        shift
+        ;;
+      *)
+        log_error "Unknown option: $1"
+        exit 1
+        ;;
     esac
   done
 
@@ -147,7 +162,7 @@ main() {
 
   # Check AWS credentials
   log_info "Checking AWS credentials..."
-  if aws sts get-caller-identity &>/dev/null; then
+  if aws sts get-caller-identity &> /dev/null; then
     local account_id
     account_id=$(aws sts get-caller-identity --query 'Account' --output text)
     log_success "AWS configured (Account: $account_id)"

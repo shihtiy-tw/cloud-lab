@@ -15,7 +15,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 show_help() {
-    cat << EOF
+  cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
 Build a Docker image and push to Amazon ECR.
@@ -52,7 +52,7 @@ EOF
 }
 
 show_version() {
-    echo "$(basename "$0") version ${SCRIPT_VERSION}"
+  echo "$(basename "$0") version ${SCRIPT_VERSION}"
 }
 
 # Logging - separate stdout/stderr
@@ -75,136 +75,136 @@ DRY_RUN=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
-    case $1 in
-        --name)
-            IMAGE_NAME="$2"
-            shift 2
-            ;;
-        --region)
-            REGION="$2"
-            shift 2
-            ;;
-        --tag)
-            TAG="$2"
-            shift 2
-            ;;
-        --dockerfile)
-            DOCKERFILE="$2"
-            shift 2
-            ;;
-        --context)
-            BUILD_CONTEXT="$2"
-            shift 2
-            ;;
-        --build-only)
-            BUILD_ONLY=true
-            shift
-            ;;
-        --push-only)
-            PUSH_ONLY=true
-            shift
-            ;;
-        --create-repo)
-            CREATE_REPO=true
-            shift
-            ;;
-        --no-create-repo)
-            CREATE_REPO=false
-            shift
-            ;;
-        --dry-run)
-            DRY_RUN=true
-            shift
-            ;;
-        -h|--help)
-            show_help
-            exit 0
-            ;;
-        -v|--version)
-            show_version
-            exit 0
-            ;;
-        *)
-            log_error "Unknown option: $1"
-            echo "Run '$(basename "$0") --help' for usage." >&2
-            exit 1
-            ;;
-    esac
+  case $1 in
+    --name)
+      IMAGE_NAME="$2"
+      shift 2
+      ;;
+    --region)
+      REGION="$2"
+      shift 2
+      ;;
+    --tag)
+      TAG="$2"
+      shift 2
+      ;;
+    --dockerfile)
+      DOCKERFILE="$2"
+      shift 2
+      ;;
+    --context)
+      BUILD_CONTEXT="$2"
+      shift 2
+      ;;
+    --build-only)
+      BUILD_ONLY=true
+      shift
+      ;;
+    --push-only)
+      PUSH_ONLY=true
+      shift
+      ;;
+    --create-repo)
+      CREATE_REPO=true
+      shift
+      ;;
+    --no-create-repo)
+      CREATE_REPO=false
+      shift
+      ;;
+    --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    -h | --help)
+      show_help
+      exit 0
+      ;;
+    -v | --version)
+      show_version
+      exit 0
+      ;;
+    *)
+      log_error "Unknown option: $1"
+      echo "Run '$(basename "$0") --help' for usage." >&2
+      exit 1
+      ;;
+  esac
 done
 
 # Validate required args
 if [[ -z "$IMAGE_NAME" ]]; then
-    log_error "Image name required. Use --name"
-    exit 1
+  log_error "Image name required. Use --name"
+  exit 1
 fi
 
 # Get AWS account
 get_account() {
-    aws sts get-caller-identity --query Account --output text
+  aws sts get-caller-identity --query Account --output text
 }
 
 main() {
-    log_step "Configuration"
-    
-    local account
-    account=$(get_account)
-    
-    local repository="${account}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE_NAME}:${TAG}"
-    
-    log_info "Image Name: $IMAGE_NAME"
-    log_info "Tag: $TAG"
-    log_info "Region: $REGION"
-    log_info "Account: $account"
-    log_info "Repository: $repository"
-    
-    if $DRY_RUN; then
-        log_step "Dry Run Summary"
-        [[ "$CREATE_REPO" == true ]] && log_info "Would create ECR repo if not exists"
-        [[ "$PUSH_ONLY" != true ]] && log_info "Would build: docker build -t $IMAGE_NAME -f $DOCKERFILE $BUILD_CONTEXT"
-        [[ "$BUILD_ONLY" != true ]] && log_info "Would push to: $repository"
-        exit 0
-    fi
-    
-    # Create repo if needed
-    if $CREATE_REPO && ! $BUILD_ONLY; then
-        log_step "ECR Repository"
-        if aws ecr describe-repositories --repository-names "$IMAGE_NAME" --region "$REGION" > /dev/null 2>&1; then
-            log_success "Repository exists"
-        else
-            log_info "Creating repository..."
-            aws ecr create-repository --repository-name "$IMAGE_NAME" --region "$REGION" > /dev/null
-            log_success "Repository created"
-        fi
-    fi
-    
-    # Build
-    if ! $PUSH_ONLY; then
-        log_step "Building Image"
-        log_info "Dockerfile: $DOCKERFILE"
-        log_info "Context: $BUILD_CONTEXT"
-        
-        docker build -t "$IMAGE_NAME" -f "$DOCKERFILE" "$BUILD_CONTEXT"
-        log_success "Image built"
-        
-        docker tag "$IMAGE_NAME" "$repository"
-        log_success "Image tagged: $repository"
-    fi
-    
-    # Push
-    if ! $BUILD_ONLY; then
-        log_step "Authenticating to ECR"
-        aws ecr get-login-password --region "$REGION" | \
-            docker login --username AWS --password-stdin "${account}.dkr.ecr.${REGION}.amazonaws.com"
-        log_success "Authenticated"
-        
-        log_step "Pushing Image"
-        docker push "$repository"
-        log_success "Image pushed: $repository"
-    fi
-    
-    log_step "Complete"
-    log_info "Repository: $repository"
+  log_step "Configuration"
+
+  local account
+  account=$(get_account)
+
+  local repository="${account}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE_NAME}:${TAG}"
+
+  log_info "Image Name: $IMAGE_NAME"
+  log_info "Tag: $TAG"
+  log_info "Region: $REGION"
+  log_info "Account: $account"
+  log_info "Repository: $repository"
+
+  if $DRY_RUN; then
+    log_step "Dry Run Summary"
+    [[ "$CREATE_REPO" == true ]] && log_info "Would create ECR repo if not exists"
+    [[ "$PUSH_ONLY" != true ]] && log_info "Would build: docker build -t $IMAGE_NAME -f $DOCKERFILE $BUILD_CONTEXT"
+    [[ "$BUILD_ONLY" != true ]] && log_info "Would push to: $repository"
     exit 0
+  fi
+
+  # Create repo if needed
+  if $CREATE_REPO && ! $BUILD_ONLY; then
+    log_step "ECR Repository"
+    if aws ecr describe-repositories --repository-names "$IMAGE_NAME" --region "$REGION" > /dev/null 2>&1; then
+      log_success "Repository exists"
+    else
+      log_info "Creating repository..."
+      aws ecr create-repository --repository-name "$IMAGE_NAME" --region "$REGION" > /dev/null
+      log_success "Repository created"
+    fi
+  fi
+
+  # Build
+  if ! $PUSH_ONLY; then
+    log_step "Building Image"
+    log_info "Dockerfile: $DOCKERFILE"
+    log_info "Context: $BUILD_CONTEXT"
+
+    docker build -t "$IMAGE_NAME" -f "$DOCKERFILE" "$BUILD_CONTEXT"
+    log_success "Image built"
+
+    docker tag "$IMAGE_NAME" "$repository"
+    log_success "Image tagged: $repository"
+  fi
+
+  # Push
+  if ! $BUILD_ONLY; then
+    log_step "Authenticating to ECR"
+    aws ecr get-login-password --region "$REGION" \
+      | docker login --username AWS --password-stdin "${account}.dkr.ecr.${REGION}.amazonaws.com"
+    log_success "Authenticated"
+
+    log_step "Pushing Image"
+    docker push "$repository"
+    log_success "Image pushed: $repository"
+  fi
+
+  log_step "Complete"
+  log_info "Repository: $repository"
+  exit 0
 }
 
 main "$@"

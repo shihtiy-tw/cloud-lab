@@ -94,7 +94,7 @@ in_list() {
   return 1
 }
 
-have_cmd() { command -v "$1" >/dev/null 2>&1; }
+have_cmd() { command -v "$1" > /dev/null 2>&1; }
 
 # require_cmd <command> [install-hint]
 # Returns EX_DEPS when the command is missing so callers can `|| exit $?`.
@@ -246,7 +246,7 @@ context_save() {
     for kv in "$@"; do
       printf '%s\n' "${kv}"
     done
-  } >"${CONTEXT_FILE}"
+  } > "${CONTEXT_FILE}"
 }
 
 # context_load - export every KEY=VALUE pair from the context file
@@ -266,7 +266,7 @@ context_load() {
     key="${BASH_REMATCH[1]}"
     value="${BASH_REMATCH[2]}"
     export "${key}=${value}"
-  done <"${CONTEXT_FILE}"
+  done < "${CONTEXT_FILE}"
   return 0
 }
 
@@ -277,7 +277,7 @@ resolve_cloud() {
     printf '%s\n' "${cloud}"
     return 0
   fi
-  context_load >/dev/null 2>&1 || true
+  context_load > /dev/null 2>&1 || true
   if [[ -n "${CLOUD_PROVIDER:-}" ]]; then
     printf '%s\n' "${CLOUD_PROVIDER}"
     return 0
@@ -298,7 +298,7 @@ find_tf_dirs() {
   fi
   find "${root}" -type f -name '*.tf' \
     -not -path '*/.terraform/*' \
-    -printf '%h\n' 2>/dev/null | sort -u
+    -printf '%h\n' 2> /dev/null | sort -u
 }
 
 # resolve_tf_dir <dir> - pick the single Terraform root to operate on.
@@ -307,11 +307,11 @@ find_tf_dirs() {
 # candidates rather than guessing which stack to touch.
 resolve_tf_dir() {
   local dir="$1"
-  if compgen -G "${dir}/*.tf" >/dev/null 2>&1; then
+  if compgen -G "${dir}/*.tf" > /dev/null 2>&1; then
     printf '%s\n' "${dir}"
     return 0
   fi
-  if compgen -G "${dir}/infrastructure/*.tf" >/dev/null 2>&1; then
+  if compgen -G "${dir}/infrastructure/*.tf" > /dev/null 2>&1; then
     printf '%s\n' "${dir}/infrastructure"
     return 0
   fi

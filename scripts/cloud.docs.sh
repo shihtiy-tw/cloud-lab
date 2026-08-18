@@ -30,7 +30,7 @@ UPDATE_README=false
 OUTPUT=""
 
 show_help() {
-  cat <<EOF
+  cat << EOF
 Usage: $(basename "$0") --cloud <provider> --service <path> [OPTIONS]
        $(basename "$0") --cloud <provider> --all [OPTIONS]
 
@@ -131,10 +131,10 @@ ensure_markers() {
   fi
   if [[ ! -f "${readme}" ]]; then
     log_info "creating ${readme#"${REPO_ROOT}"/}"
-    printf '# %s\n\n' "$(basename "$(dirname "${readme}")")" >"${readme}"
+    printf '# %s\n\n' "$(basename "$(dirname "${readme}")")" > "${readme}"
   fi
   log_info "appending terraform-docs markers to ${readme#"${REPO_ROOT}"/}"
-  printf '\n## Terraform reference\n\n%s\n%s\n' "${MARKER_BEGIN}" "${MARKER_END}" >>"${readme}"
+  printf '\n## Terraform reference\n\n%s\n%s\n' "${MARKER_BEGIN}" "${MARKER_END}" >> "${readme}"
   return 0
 }
 

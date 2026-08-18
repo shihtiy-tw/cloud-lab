@@ -30,7 +30,7 @@ RESOURCE_GROUP=""
 COMPARTMENT=""
 
 show_help() {
-  cat <<EOF
+  cat << EOF
 Usage: $(basename "$0") --cloud <provider> [OPTIONS]
        $(basename "$0") --show [--export]
 
@@ -162,7 +162,7 @@ show_context() {
         value="${BASH_REMATCH[2]}"
         printf 'export %s=%q\n' "${key}" "${value}"
       fi
-    done <"${CONTEXT_FILE}"
+    done < "${CONTEXT_FILE}"
     return "${EX_OK}"
   fi
 
@@ -173,7 +173,7 @@ show_context() {
     if [[ "${line}" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
       printf '  %-28s %s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
     fi
-  done <"${CONTEXT_FILE}"
+  done < "${CONTEXT_FILE}"
   return "${EX_OK}"
 }
 
@@ -196,20 +196,20 @@ verify_credentials() {
   local ok=true
   case "${cloud}" in
     aws)
-      aws sts get-caller-identity >/dev/null 2>&1 || ok=false
+      aws sts get-caller-identity > /dev/null 2>&1 || ok=false
       ;;
     gcp)
       local active_account=""
-      active_account="$(gcloud auth list --filter=status:ACTIVE --format='value(account)' 2>/dev/null || true)"
+      active_account="$(gcloud auth list --filter=status:ACTIVE --format='value(account)' 2> /dev/null || true)"
       if [[ -z "${active_account}" ]]; then
         ok=false
       fi
       ;;
     azure)
-      az account show >/dev/null 2>&1 || ok=false
+      az account show > /dev/null 2>&1 || ok=false
       ;;
     oracle)
-      oci iam region list >/dev/null 2>&1 || ok=false
+      oci iam region list > /dev/null 2>&1 || ok=false
       ;;
     *)
       log_warn "no credential check defined for '${cloud}'"
@@ -247,20 +247,20 @@ apply_cli_config() {
     gcp)
       if [[ -n "${PROJECT}" ]]; then
         log_info "gcloud config set project ${PROJECT}"
-        gcloud config set project "${PROJECT}" >/dev/null 2>&1 ||
-          log_warn "gcloud config set project failed"
+        gcloud config set project "${PROJECT}" > /dev/null 2>&1 \
+          || log_warn "gcloud config set project failed"
       fi
       if [[ -n "${REGION}" ]]; then
         log_info "gcloud config set compute/region ${REGION}"
-        gcloud config set compute/region "${REGION}" >/dev/null 2>&1 ||
-          log_warn "gcloud config set compute/region failed"
+        gcloud config set compute/region "${REGION}" > /dev/null 2>&1 \
+          || log_warn "gcloud config set compute/region failed"
       fi
       ;;
     azure)
       if [[ -n "${SUBSCRIPTION}" ]]; then
         log_info "az account set --subscription ${SUBSCRIPTION}"
-        az account set --subscription "${SUBSCRIPTION}" >/dev/null 2>&1 ||
-          log_warn "az account set failed"
+        az account set --subscription "${SUBSCRIPTION}" > /dev/null 2>&1 \
+          || log_warn "az account set failed"
       fi
       ;;
     aws | oracle)

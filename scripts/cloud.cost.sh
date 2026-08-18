@@ -37,7 +37,7 @@ END_DATE=""
 TMP_DIR=""
 
 show_help() {
-  cat <<EOF
+  cat << EOF
 Usage: $(basename "$0") --cloud <provider> [--timeframe <period>] [OPTIONS]
        $(basename "$0") --cloud <provider> --estimate --service <path>
        $(basename "$0") --cloud <provider> --estimate --plan <plan-file>
@@ -262,10 +262,10 @@ export_results() {
   # Aggregate once so CSV and JSON are byte-stable and ranked the same way as
   # the printed table.
   local agg="${TMP_DIR}/aggregate.tsv"
-  aggregate_costs "${tsv}" >"${agg}"
+  aggregate_costs "${tsv}" > "${agg}"
 
   local total_rows
-  total_rows="$(wc -l <"${agg}")"
+  total_rows="$(wc -l < "${agg}")"
 
   if [[ "${EXPORT}" == *.json ]]; then
     {
@@ -287,10 +287,10 @@ export_results() {
         item="${item//\\/\\\\}"
         item="${item//\"/\\\"}"
         printf '    {"item": "%s", "cost": %s}%s\n' "${item}" "${cost}" "${sep}"
-      done <"${agg}"
+      done < "${agg}"
       printf '  ]\n'
       printf '}\n'
-    } >"${EXPORT}"
+    } > "${EXPORT}"
   else
     {
       printf 'item,cost_usd\n'
@@ -299,8 +299,8 @@ export_results() {
         # Quote the label and double any embedded quotes, per RFC 4180.
         item="${item//\"/\"\"}"
         printf '"%s",%s\n' "${item}" "${cost}"
-      done <"${agg}"
-    } >"${EXPORT}"
+      done < "${agg}"
+    } > "${EXPORT}"
   fi
   log_success "exported to ${EXPORT}"
   return 0
@@ -322,12 +322,12 @@ cost_aws() {
     --metrics UnblendedCost \
     --group-by "${group_by}" \
     --query 'ResultsByTime[].Groups[].[Keys[0],Metrics.UnblendedCost.Amount]' \
-    --output text >"${tsv}" 2>"${TMP_DIR}/aws-cost.err" || rc=$?
+    --output text > "${tsv}" 2> "${TMP_DIR}/aws-cost.err" || rc=$?
 
   if [[ "${rc}" -ne 0 ]]; then
     log_error "aws ce get-cost-and-usage failed (exit ${rc})"
     if [[ -s "${TMP_DIR}/aws-cost.err" ]]; then
-      while IFS= read -r line; do log_error "  ${line}"; done <"${TMP_DIR}/aws-cost.err"
+      while IFS= read -r line; do log_error "  ${line}"; done < "${TMP_DIR}/aws-cost.err"
     fi
     log_error "  Cost Explorer needs the ce:GetCostAndUsage permission and must be enabled on the account"
     return "${EX_ERROR}"
@@ -488,7 +488,7 @@ estimate_costs() {
         return "${EX_USAGE}"
       fi
       path="${TMP_DIR}/plan.json"
-      terraform -chdir="${tf_dir}" show -json "${PLAN_FILE}" >"${path}"
+      terraform -chdir="${tf_dir}" show -json "${PLAN_FILE}" > "${path}"
     fi
   else
     if [[ -z "${SERVICE}" ]]; then
