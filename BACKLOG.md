@@ -53,6 +53,12 @@ detail behind each.
       copy
 - [ ] Fix `region = terraform.workspace` in the 26 `aws/` files that do it — it is
       why `--env` cannot select a workspace, and new stacks must not copy it
+- [ ] Audit the pre-existing AWS stacks for hardcoded values and move them to
+      variables fed from `.env`. `.env.example` and the `.env` loader in
+      `scripts/lib/common.sh` cover the SPEC-003 paths only; the ~101 `.tf` files
+      inherited from the initial commit were not swept. Genuine constants (a
+      `0.0.0.0/0` default route, Azure's mandatory Standard SKUs) should stay
+      literal with a comment saying why
 - [ ] Fill the empty root `tests/` and `examples/` directories, or drop them
 - [ ] Normalise cost reporting beyond AWS — other providers currently pass native
       CLI output straight through

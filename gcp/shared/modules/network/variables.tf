@@ -82,6 +82,39 @@ variable "iap_target_tags" {
   }
 }
 
+variable "iap_source_ranges" {
+  description = <<-EOT
+    Source ranges allowed to reach tcp:22 on tagged instances.
+
+    The default is the range Google publishes for IAP TCP forwarding, and it is
+    the authoritative copy of that constant for this repository -- callers should
+    leave it alone unless Google changes the range or adds a second one. It is a
+    variable rather than a literal so that a change is a one-line edit in one
+    place instead of a hunt through the module, and so it can be overridden from
+    the environment for a genuine reason.
+
+    It is deliberately NOT something you are expected to set. The validation below
+    rejects opening this to the internet, because doing so silently converts an
+    IAP-brokered box into a public SSH server -- the exact outcome this network is
+    designed to prevent. If IAP is broken, recover via the serial console (see
+    docs/runbooks/dev-vm-break-glass.md), not by widening this.
+  EOT
+  type        = list(string)
+  default     = ["35.235.240.0/20"]
+
+  validation {
+    condition     = length(var.iap_source_ranges) > 0
+    error_message = "iap_source_ranges must not be empty; the rule would have no source and the VM would be unreachable."
+  }
+
+  validation {
+    condition = !anytrue([
+      for cidr in var.iap_source_ranges : contains(["0.0.0.0/0", "::/0"], cidr)
+    ])
+    error_message = "iap_source_ranges must not contain 0.0.0.0/0 or ::/0. That exposes SSH to the internet, which this design exists to prevent; use the serial console recovery path instead."
+  }
+}
+
 variable "enable_cloud_nat" {
   description = <<-EOT
     Give the subnetwork egress through Cloud NAT. Required for anything that has

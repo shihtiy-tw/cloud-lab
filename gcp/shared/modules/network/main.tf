@@ -145,16 +145,19 @@ resource "google_compute_firewall" "iap_ssh" {
     ports    = ["22"]
   }
 
-  # 35.235.240.0/20 is the only range IAP TCP forwarding originates from, and it
-  # is not routable from the internet -- a packet can only arrive from it after
-  # IAP has authenticated and authorised the caller against IAM.
+  # Defaults to the range IAP TCP forwarding originates from, which is not
+  # routable from the internet -- a packet can only arrive from it after IAP has
+  # authenticated and authorised the caller against IAM. The value lives in
+  # var.iap_source_ranges so the constant is declared once rather than buried
+  # here; see that variable for why you should not override it.
   #
   # This is the one ingress rule in the VPC. Never widen it and never add
   # 0.0.0.0/0 "just to debug": that single edit converts an IAP-brokered box into
   # an internet-exposed SSH server, which is precisely what this design exists to
-  # prevent. If IAP is broken, use the serial console recovery path documented in
+  # prevent. The variable's validation now refuses that edit. If IAP is broken,
+  # use the serial console recovery path documented in
   # gcp/compute/dev-vm/README.md instead.
-  source_ranges = ["35.235.240.0/20"]
+  source_ranges = var.iap_source_ranges
   target_tags   = var.iap_target_tags
 
   # Firewall Rules Logging on the allow path is how "who reached this box, when?"

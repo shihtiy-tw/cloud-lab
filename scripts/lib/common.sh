@@ -113,6 +113,61 @@ require_cmd() {
 
 utc_now() { date -u '+%Y-%m-%dT%H:%M:%SZ'; }
 
+# --- Environment file --------------------------------------------------------
+#
+# Loads ${REPO_ROOT}/.env so credentials and TF_VAR_/PKR_VAR_ inputs live in one
+# gitignored file instead of being hardcoded in Terraform or retyped per command.
+# See .env.example for the documented set.
+#
+# Two deliberate choices:
+#
+#   1. The file is *sourced*, not parsed as inert KEY=VALUE. That is what lets a
+#      value come from a secret store at use time --
+#      `export ARM_CLIENT_SECRET="$(op read ...)"` -- instead of sitting in
+#      plaintext on disk. The cost is that .env runs as shell; it is gitignored
+#      and user-authored, so that is an acceptable trade, but it is a real one.
+#
+#   2. An already-set variable beats the file. This matches every other dotenv
+#      loader and keeps one-off overrides working:
+#      `AWS_PROFILE=other ./scripts/cloud.cost.sh --cloud aws`. Without it, .env
+#      would silently win and the override would look broken.
+load_dotenv() {
+  local env_file="${CLOUD_LAB_ENV_FILE:-${REPO_ROOT}/.env}"
+
+  if [[ ! -f "${env_file}" ]]; then
+    log_debug "no env file at ${env_file}"
+    return 0
+  fi
+
+  # Names the file assigns, so their pre-existing values can be put back after.
+  local -a names=()
+  local name
+  while IFS= read -r name; do
+    [[ -n "${name}" ]] && names+=("${name}")
+  done < <(sed -nE 's/^[[:space:]]*(export[[:space:]]+)?([A-Za-z_][A-Za-z0-9_]*)=.*/\2/p' "${env_file}" | sort -u)
+
+  local -a restore=()
+  for name in "${names[@]+"${names[@]}"}"; do
+    if [[ -n "${!name+x}" ]]; then
+      restore+=("${name}=${!name}")
+    fi
+  done
+
+  set -a
+  # shellcheck source=/dev/null
+  source "${env_file}"
+  set +a
+
+  local kv
+  for kv in "${restore[@]+"${restore[@]}"}"; do
+    export "${kv?}"
+  done
+
+  log_debug "loaded ${env_file} (${#names[@]} names, ${#restore[@]} kept from the environment)"
+}
+
+load_dotenv
+
 # confirm <prompt> [expected-answer]
 # Requires an interactive terminal; refuses rather than assuming consent.
 confirm() {

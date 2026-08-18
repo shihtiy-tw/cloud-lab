@@ -23,16 +23,25 @@ the resources do not.
 | `google_compute_network` | `auto_create_subnetworks = false`. Auto-mode VPCs ship a subnet per region and a `default-allow-ssh` rule open to `0.0.0.0/0`. |
 | `google_compute_subnetwork` | One private range with `private_ip_google_access = true` and sampled flow logs. |
 | `google_compute_router` + `google_compute_router_nat` | Egress for apt, GitHub and registries. Optional via `enable_cloud_nat`. |
-| `google_compute_firewall.iap_ssh` | tcp:22 from `35.235.240.0/20` only, scoped to `var.iap_target_tags`. The only ingress rule. |
+| `google_compute_firewall.iap_ssh` | tcp:22 from `var.iap_source_ranges` only (default: the IAP range), scoped to `var.iap_target_tags`. The only ingress rule. |
 | `google_compute_firewall.deny_all_ingress` | Explicit deny at priority 65533, for logging and reviewability. |
 
 ## The two ranges that matter
 
 - `35.235.240.0/20` — IAP TCP forwarding. Not routable from the internet; traffic
   only appears from it after IAP has authorised the caller against IAM. This is
-  the allowed SSH source and the only one.
+  the allowed SSH source and the only one. It is declared once, as the default of
+  `var.iap_source_ranges`, rather than written into the firewall rule — so if
+  Google ever changes or adds a range, this module has exactly one line to edit.
 - `0.0.0.0/0` — appears exactly once, on the *deny* rule. If you ever see it on
   an `allow` rule in this module, that is the bug.
+
+`var.iap_source_ranges` is overridable but guarded: its validation rejects
+`0.0.0.0/0` and `::/0` outright, including inside a longer list. Widening the one
+ingress rule to the internet is the single edit that would undo this design, so
+Terraform refuses it rather than trusting review to catch it. A narrower range is
+accepted. When IAP itself is broken, recover through the serial console
+(`docs/runbooks/dev-vm-break-glass.md`) instead of opening the firewall.
 
 ## Costs
 

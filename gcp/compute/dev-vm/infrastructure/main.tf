@@ -117,6 +117,10 @@ module "network" {
   labels       = local.common_labels
 
   enable_cloud_nat = var.enable_cloud_nat
+
+  # null means "use the module's default", which is the published IAP range. The
+  # constant is deliberately not repeated here -- the module owns it.
+  iap_source_ranges = var.iap_source_ranges
 }
 
 # ---------------------------------------------------------------------------

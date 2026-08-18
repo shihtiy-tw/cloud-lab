@@ -97,8 +97,11 @@ skipping a step produces a stack that applies cleanly and then does not work.
    ```
 
 8. **Verify the properties rather than trusting them.** `has_external_ip` must be
-   `false` and `iap_firewall_source_ranges` must be exactly
-   `["35.235.240.0/20"]`.
+   `false`, and `iap_firewall_source_ranges` must equal whatever
+   `var.iap_source_ranges` resolves to — by default the published IAP range,
+   `["35.235.240.0/20"]`. It can never be `0.0.0.0/0`: the network module's
+   variable validation rejects that value, so the check below is a second line of
+   defence rather than the only one.
 
 ## Layout
 

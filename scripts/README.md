@@ -26,8 +26,26 @@ Every script:
 - accepts `--help` and `--version`
 - takes `--cloud aws|gcp|azure|oracle`, falling back to `CLOUD_PROVIDER` in
   `.cloud-context` when the flag is omitted
+- loads `.env` from the repository root, if present (see below)
 - writes all diagnostics to stderr, leaving stdout for data you may want to pipe
 - returns the exit codes below
+
+### `.env` loading
+
+`common.sh` sources `${REPO_ROOT}/.env` at load time, so credentials and
+`TF_VAR_`/`PKR_VAR_` inputs live in one gitignored file rather than being passed on
+every command line. `../.env.example` documents the full set. Override the path
+with `CLOUD_LAB_ENV_FILE`.
+
+Two properties, both deliberate:
+
+| Property | Why |
+|----------|-----|
+| The file is **sourced as shell**, not parsed as inert `KEY=VALUE` | Lets a value come from a secret store at use time — `export ARM_CLIENT_SECRET="$(op read ...)"` — instead of sitting in plaintext. The cost is that `.env` runs with your privileges. |
+| An **already-set variable beats the file** | Keeps one-off overrides working: `AWS_PROFILE=other ./scripts/cloud.cost.sh --cloud aws`. If the file won instead, the override would look broken. |
+
+A missing `.env` is a silent no-op, not an error — run `CLOUD_LAB_DEBUG=1` to see
+what was loaded and how many names the surrounding environment kept.
 
 ### Exit codes
 

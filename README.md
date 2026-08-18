@@ -45,6 +45,43 @@ Run `./aws/scripts/setup-dev.sh` to install the linting and security toolchain
 the manual stage until these are present — see
 [`.pre-commit-config.yaml`](.pre-commit-config.yaml) for why.
 
+### Configuration: `.env`, not hardcoded values
+
+Nothing environment-specific is baked into the Terraform. Project names, regions,
+image ids, machine sizes and credentials all arrive as variables, and the place to
+put them is a gitignored `.env` at the repository root:
+
+```bash
+cp .env.example .env && $EDITOR .env
+```
+
+[`.env.example`](.env.example) is the documented list of every variable the repo
+reads, grouped by cloud, with the required ones uncommented and the optional ones
+commented out alongside their real defaults. `scripts/cloud.*.sh` load `.env`
+automatically. For a bare `terraform` or `packer` call, export it yourself:
+
+```bash
+set -a && . ./.env && set +a
+```
+
+Terraform reads `TF_VAR_<name>` for any input variable and Packer reads
+`PKR_VAR_<name>`, so every variable is settable this way without a tfvars file.
+Two behaviours worth knowing:
+
+- **The file is sourced as shell**, so `export FOO="$(op read ...)"` works. That is
+  the recommended way to handle secrets — fetch them from a real secret store at
+  use time rather than writing them to disk in plaintext. The flip side is that
+  `.env` executes with your privileges; treat it as a script you wrote.
+- **An already-set variable wins over the file**, so a one-off
+  `AWS_PROFILE=other ./scripts/cloud.cost.sh --cloud aws` behaves as you'd expect.
+
+A handful of values are intentionally *not* configurable, because they are
+constants rather than settings: a default route is `0.0.0.0/0` by definition, and
+the GCP IAP forwarding range is published by Google. The latter is still a
+variable so it is declared in exactly one place — but its validation rejects
+`0.0.0.0/0` and `::/0`, since widening the sole ingress rule to the internet is
+the one edit that would defeat the whole design.
+
 ### The cloud.* commands
 
 Seven cloud-aware wrappers handle the common lifecycle across every provider:

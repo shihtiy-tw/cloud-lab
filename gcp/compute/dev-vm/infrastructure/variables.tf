@@ -132,6 +132,20 @@ variable "enable_cloud_nat" {
   default     = true
 }
 
+variable "iap_source_ranges" {
+  description = <<-EOT
+    Override the source ranges on the one tcp:22 ingress rule. Leave null: null
+    means the network module's default, which is the range Google publishes for
+    IAP TCP forwarding, declared once in gcp/shared/modules/network.
+
+    Exposed here only so the value can come from the environment
+    (TF_VAR_iap_source_ranges) if Google ever changes the range. The module
+    rejects 0.0.0.0/0 and ::/0 regardless of how the value arrives.
+  EOT
+  type        = list(string)
+  default     = null
+}
+
 variable "additional_network_tags" {
   description = "Extra network tags for the instance, appended to the IAP tag the firewall rule matches."
   type        = list(string)
